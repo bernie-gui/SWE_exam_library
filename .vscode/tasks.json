@@ -1,0 +1,24 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Make: Debug Main",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "BUILD=debug"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "Make: Debug Examples",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "BUILD=debug",
+                "examples"
+            ],
+            "group": "build"
+        }
+    ]
+}

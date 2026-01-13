@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug: Main",
+            "type": "lldb-dap",
+            "request": "launch",
+            "program": "${workspaceFolder}/main",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Make: Debug Main"
+        },
+        {
+            "name": "Debug: Example Droni 1",
+            "type": "lldb-dap",
+            "request": "launch",
+            "program": "${workspaceFolder}/example-droni_1",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Make: Debug Examples"
+        },
+    ]
+}

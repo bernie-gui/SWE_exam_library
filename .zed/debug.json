@@ -1,0 +1,46 @@
+// Project-local debug tasks
+//
+// For more documentation on how to configure debug tasks,
+// see: https://zed.dev/docs/debugger
+[
+  {
+    "adapter": "CodeLLDB",
+    "label": "Debug: Template",
+    "request": "launch",
+    "program": "template",
+    "build": {
+      "command": "make",
+      "args": ["BUILD=debug"],
+    },
+  },
+  {
+    "adapter": "CodeLLDB",
+    "label": "Debug: example 09-01-2025",
+    "request": "launch",
+    "program": "example-09-01-2025",
+    "build": {
+      "command": "make",
+      "args": ["BUILD=debug", "examples"],
+    },
+  },
+  {
+    "adapter": "CodeLLDB",
+    "label": "Debug: example 09-01-2025_2",
+    "request": "launch",
+    "program": "example-09-01-2025_2",
+    "build": {
+      "command": "make",
+      "args": ["BUILD=debug", "examples"],
+    },
+  },
+  {
+    "adapter": "CodeLLDB",
+    "label": "Debug: example 09-01-2025_3",
+    "request": "launch",
+    "program": "example-09-01-2025_3",
+    "build": {
+      "command": "make",
+      "args": ["BUILD=debug", "examples"],
+    },
+  },
+]
