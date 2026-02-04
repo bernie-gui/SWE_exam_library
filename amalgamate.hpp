@@ -387,10 +387,10 @@ namespace isw
 #pragma once
 
 #include <cstddef>
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <optional>
-#include <set>
+#include <unordered_set>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -573,7 +573,7 @@ namespace isw
         /** @brief List of networks. */
         std::vector< std::shared_ptr< network_t > > _networks;
         /** @brief Map of worlds to sets of process IDs. */
-        std::map< world_key_t, std::set< size_t > > _worlds;
+        std::unordered_map< world_key_t, std::unordered_set< size_t > > _worlds;
         /** @brief Global state. */
         std::shared_ptr< global_t > _global;
         /** @brief System name. */

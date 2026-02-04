@@ -6,30 +6,31 @@ TARGET      := main
 SRC_DIR     := src
 INC_DIR     := include
 BUILD_DIR   := build
+BINS_DIR    := bins
 
 # Tools
 CXX         := g++
 CXXSTD      := -std=c++17
 
-# Build type (can be overridden: make BUILD=release)
-BUILD       ?= release
+# Build type (can be overridden: make BUILD=use)
+BUILD       ?= use
 
 # Common flags
 WARNINGS    := -Wall -Wextra -Wpedantic
 INCLUDES    := -I$(INC_DIR)
 
 ifeq ($(BUILD),debug)
-  CXXFLAGS  := $(CXXSTD) $(WARNINGS) $(INCLUDES) -g -O0 -DNDEBUG
-else ifeq ($(BUILD),release)
-  CXXFLAGS  := $(CXXSTD) $(WARNINGS) $(INCLUDES) -O3
+  CXXFLAGS  := $(CXXSTD) $(WARNINGS) $(INCLUDES) -g -O0
+else ifeq ($(BUILD),use)
+  CXXFLAGS  := $(CXXSTD) $(WARNINGS) $(INCLUDES) -O3 -DNDEBUG
 else
-  $(error Unknown BUILD mode '$(BUILD)'. Use BUILD=debug or BUILD=release)
+  $(error Unknown BUILD mode '$(BUILD)'. Use BUILD=debug or BUILD=use)
 endif
 
 # Example-specific flags (always debug)
 EX_CXXFLAGS := $(CXXSTD) $(WARNINGS) $(INCLUDES) -g -O0
 
-LDFLAGS     :=
+LDFLAGS     := -lm
 
 # Sources and objects
 SRC_FILES := $(shell find $(SRC_DIR) -name '*.cpp')
@@ -40,7 +41,7 @@ MAIN_OBJ := $(BUILD_DIR)/main.o
 EXAMPLES_DIR := examples
 EX_OBJ_DIR   := $(BUILD_DIR)/examples
 EX_SRC_FILES := $(wildcard $(EXAMPLES_DIR)/*.cpp)
-EX_BINS      := $(patsubst $(EXAMPLES_DIR)/%.cpp,%,$(EX_SRC_FILES))
+EX_BINS      := $(patsubst $(EXAMPLES_DIR)/%.cpp,$(BINS_DIR)/%,$(EX_SRC_FILES))
 EX_OBJ_FILES := $(patsubst $(EXAMPLES_DIR)/%.cpp,$(EX_OBJ_DIR)/%.o,$(EX_SRC_FILES))
 
 # compile_commands.json
@@ -51,7 +52,7 @@ COMPILE_COMMANDS := compile_commands.json
 all: $(COMPILE_COMMANDS) $(TARGET)
 
 # Generate compile_commands.json
-$(COMPILE_COMMANDS): $(SRC_FILES)
+$(COMPILE_COMMANDS): $(SRC_FILES) main.cpp
 	@echo "Generating $(COMPILE_COMMANDS)..."
 	@echo "[" > $(COMPILE_COMMANDS)
 	@for src in $(SRC_FILES); do \
@@ -63,8 +64,12 @@ $(COMPILE_COMMANDS): $(SRC_FILES)
 		echo "    \"file\": \"$$src\"" >> $(COMPILE_COMMANDS); \
 		echo "  }," >> $(COMPILE_COMMANDS); \
 	done
-	@sed -i '$$s/,//' $(COMPILE_COMMANDS)
-	@echo "]" >> $(COMPILE_COMMANDS)
+	@echo "  {" >> $(COMPILE_COMMANDS); \
+	echo "    \"directory\": \"$$(pwd)\"," >> $(COMPILE_COMMANDS); \
+	echo "    \"command\": \"$(CXX) $(CXXFLAGS) -c main.cpp -o $(BUILD_DIR)/main.o\"," >> $(COMPILE_COMMANDS); \
+	echo "    \"file\": \"main.cpp\"" >> $(COMPILE_COMMANDS); \
+	echo "  }" >> $(COMPILE_COMMANDS); \
+	echo "]" >> $(COMPILE_COMMANDS)
 
 # Link main target
 $(TARGET): $(MAIN_OBJ) $(OBJ_FILES)
@@ -85,8 +90,8 @@ $(EX_OBJ_DIR)/%.o: $(EXAMPLES_DIR)/%.cpp | $(EX_OBJ_DIR)
 	@mkdir -p $(dir $@)
 	$(CXX) $(EX_CXXFLAGS) -c $< -o $@
 
-# Link example binaries (in project root)
-%: $(EX_OBJ_DIR)/%.o $(OBJ_FILES)
+# Link example binaries (in bins directory)
+$(BINS_DIR)/%: $(EX_OBJ_DIR)/%.o $(OBJ_FILES)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
 # Ensure build directories exist
@@ -96,14 +101,17 @@ $(BUILD_DIR):
 $(EX_OBJ_DIR):
 	mkdir -p $(EX_OBJ_DIR)
 
+$(BINS_DIR):
+	mkdir -p $(BINS_DIR)
+
 # Convenience targets
-.PHONY: debug release clean examples
+.PHONY: debug use clean examples
 
 debug:
 	$(MAKE) BUILD=debug
 
-release:
-	$(MAKE) BUILD=release
+use:
+	$(MAKE) BUILD=use
 
 examples: $(EX_BINS)
 

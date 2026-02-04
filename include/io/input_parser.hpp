@@ -29,8 +29,6 @@
 #include <cassert>
 #include <filesystem>
 #include <fstream>
-#include <memory>
-#include "global.hpp"
 
 namespace isw
 {
@@ -45,10 +43,9 @@ namespace isw
         /**
          * @brief Constructor.
          * @param[in] path Path to the input file.
-         * @param[in] global Shared pointer to global state.
          * @throws std::runtime_error If file cannot be opened.
          */
-        input_parser_t( std::shared_ptr< global_t > global,  const std::filesystem::path &path = "parameters.txt" );
+        input_parser_t( const std::filesystem::path &path = "parameters.txt" );
         ~input_parser_t();
 
         // // forward extraction to the underlying stream
@@ -70,18 +67,6 @@ namespace isw
          */
         std::ifstream &get_stream();
         /**
-         * @brief Gets the global state, cast to type T.
-         * @tparam T Type to cast to, defaults to global_t.
-         * @return Shared pointer to casted global.
-         */
-        template< typename T = global_t >
-        std::shared_ptr< T > get_global()
-        {
-            auto casted = std::dynamic_pointer_cast< T >( _global );
-            assert( casted );
-            return casted;
-        }
-        /**
          * @brief Resets the stream to the beginning.
          * @details Clears error flags and seeks to position 0.
          */
@@ -90,17 +75,5 @@ namespace isw
     private:
         /** @brief Input file stream. */
         std::ifstream _stream;
-        /** @brief Global state. */
-        std::shared_ptr< global_t > _global;
     };
-} // namespace isw
-
-//    std::string line;
-// while(std::getline(file, line))
-
-// ifstream in;
-// in >> whatever;
-/*
- *jjjkk
- *
- */
+} 

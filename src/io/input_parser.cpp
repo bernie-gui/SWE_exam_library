@@ -30,8 +30,7 @@
 using namespace isw;
 
 
-input_parser_t::input_parser_t( std::shared_ptr< global_t > global, const std::filesystem::path &path ) :
-    _global( global )
+input_parser_t::input_parser_t( const std::filesystem::path &path )
 {
     assert( std::filesystem::exists( path ) );
     assert( std::filesystem::is_regular_file( path ) );
@@ -59,79 +58,3 @@ input_parser_t::~input_parser_t()
         _stream.close();
     }
 }
-
-// very important tutorial right here
-// this is for format
-// TYPE VALUE
-// e.g. H 100 \n W 120 \n C 130.01
-// or: ... \n COST 130.01
-// void how_to_parse( std::ifstream file )
-// {
-
-//     double very_important_variable;
-//     double mututo_di_casa;
-//     int horizon;
-
-//     std::string line;
-//     while ( std::getline( file, line ) )
-//     {
-//         std::istringstream iss( line );
-//         char tag;
-
-//         // malformatted
-//         if ( !( iss >> tag ) )
-//             continue;
-
-//         switch ( tag )
-//         {
-//             case 'C':
-//                 iss >> mututo_di_casa;
-//                 break;
-//             case 'H':
-//                 iss >> horizon;
-//                 break;
-//             case 'V':
-//                 iss >> very_important_variable;
-//                 break;
-//             default:
-//                 break;
-//         }
-//     }
-// }
-
-// parsing files like
-// A 1 2 3 4
-// if (sscanf(line, "A %d %d %lf %lf", &i, &j, &prob, &cost) >= 4) {
-// void how_to_parse2( std::ifstream file )
-// {
-
-//     double very_important_variable;
-//     double mututo_di_casa, prob, cost;
-//     int horizon = 0, i = 0, j = 0;
-
-//     std::string line;
-//     while ( std::getline( file, line ) )
-//     {
-//         std::istringstream iss( line );
-//         char tag;
-
-//         // mal formatted
-//         if ( !( iss >> tag ) )
-//         {
-//             continue;
-//         }
-
-//         if ( tag == 'A' )
-//         {
-//             // cpp wizardy
-//             if ( iss >> i >> j >> prob >> cost )
-//             {
-//                 very_important_variable = i;
-//                 mututo_di_casa = j;
-//                 horizon = cost;
-//                 // assign variables
-//             }
-//         }
-//     }
-//     std:: cout << mututo_di_casa << very_important_variable << horizon << std::endl;
-// }
