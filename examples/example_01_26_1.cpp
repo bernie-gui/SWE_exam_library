@@ -1,17 +1,13 @@
+#include <cstddef>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include "io/input_parser.hpp"
 #include "process.hpp"
 #include "simulator.hpp"
 #include "system.hpp"
 using namespace isw;
-
-
-class plpl_reader : public input_parser_t {
-    public:
-    plpl_reader( std::shared_ptr< global_t > global, const std::filesystem::path &path ) : input_parser_t( global, path ) {}
-};
 
 class uav_global : public global_t
 {
@@ -114,15 +110,19 @@ int main()
 {
     auto gl = std::make_shared< uav_global >();
     auto sys = std::make_shared< system_t >( gl);
-    gl->set_horizon(50);
-    gl->A = 10;
-    gl->L = .1;
-    gl->T = 0.5;
-    gl->V = 0;
-    gl->R = 1;
-    gl->D = 100;
-    for ( int i = 0; i < 10; i++ )
-    {
+    size_t N;
+    auto reader = lambda_parser("bins/example_01_26_1.txt", {
+        {"A", [gl](auto& iss) { iss >> gl->A; }},
+        {"L", [gl](auto& iss) { iss >> gl->L; }},
+        {"V", [gl](auto& iss) { iss >> gl->V; }},
+        {"R", [gl](auto& iss) { iss >> gl->R; }},
+        {"D", [gl](auto& iss) { iss >> gl->D; }},
+        {"T", [gl](auto& iss) { iss >> gl->T; }},
+        {"H", [gl](auto& iss) { double temp; iss >> temp; gl->set_horizon(temp); }},
+        {"N", [&N](auto& iss) { iss >> N; }}}
+    );
+    reader.parse();
+    for ( size_t i = 0; i < N; i++ ) {
         sys->add_process( std::make_shared< uav >()->add_thread( std::make_shared< uav_thread >() ), "UAVs" );
     }
     sys->add_process(
@@ -136,7 +136,7 @@ int main()
     sim->run();
 
     auto final_gl = sys->get_global< uav_global >();
-    std::cout << "Simulation ended. Collision rate: " << final_gl->rate << " collisions per second." << std::endl;
+    std::cout << "Simulation ended. Collision rate: " << final_gl->rate << std::endl;
 
     return 0;
 }

@@ -56,7 +56,7 @@ class my_input_parser_t : public input_parser_t
 {
 public:
     my_input_parser_t( std::shared_ptr< global_t > global ) :
-        input_parser_t( global, "parameters.txt" )
+        input_parser_t( "parameters.txt" )
     {
     }
 
