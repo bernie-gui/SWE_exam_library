@@ -22,7 +22,7 @@ public:
     }
 };
 
-class uav : public process_t //generalize
+class uav : public process_t
 {
 public:
     double pos[3], vel[3];
@@ -69,7 +69,7 @@ public:
     }
 };
 
-class coll_det_thread : public thread_t // generalize
+class coll_det_thread : public thread_t
 {
 public:
     void fun() override
@@ -128,7 +128,7 @@ int main()
     auto gl = std::make_shared< uav_global >();
     auto sys = std::make_shared< system_t >( gl);
     size_t N;
-    auto reader = lambda_parser("examples/example_01_26_1.txt", {
+    auto reader = lambda_parser("bins/example_01_26_1.txt", {
         {"A", [gl](auto& iss) { iss >> gl->A; }},
         {"L", [gl](auto& iss) { iss >> gl->L; }},
         {"V", [gl](auto& iss) { iss >> gl->V; }},

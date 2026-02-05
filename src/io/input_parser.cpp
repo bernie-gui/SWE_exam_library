@@ -26,6 +26,7 @@
  */
 #include "io/input_parser.hpp"
 #include <iostream>
+#include <stdexcept>
 // #include <sys/cdefs.h>
 using namespace isw;
 
@@ -77,5 +78,7 @@ void lambda_parser::parse() {
             auto& parser = it->second;
             parser(iss);
         }
+        else 
+            throw std::runtime_error(" unknown input specified ");
     }
 }
