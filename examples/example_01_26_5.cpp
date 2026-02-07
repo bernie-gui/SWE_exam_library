@@ -22,7 +22,7 @@ using namespace isw;
 class requests_global : public global_t {
     public:
         size_t Q, P, S, C;
-        double A, B, W, V, a, b,
+        double A, B, V, W, a, b, F,
             last_time = 0, rate = 0;
         void init() override {
             global_t::init();
@@ -151,17 +151,18 @@ class sim_help : public simulator_t {
         sim_help(std::shared_ptr<system_t> s) : simulator_t(s) {}
 };
 
-class my_opt : public optimizer_t<int> {
+class my_opt : public optimizer_t<double> {
     public:
-        double obj_fun( std::vector<int> &arguments ) override {
-            int F = arguments[0];
+        double obj_fun( std::vector<double> &arguments ) override {
             size_t i;
             auto gl = get_global<requests_global>();
+            gl->V = arguments[0];
+            gl->W = gl->V + 5;
             auto sys = std::make_shared<system_t>(gl);
             for (i = 0; i < gl->S; i++ ) {
                 sys->add_process( std::make_shared< server >()->add_thread( std::make_shared< server_thread >() ), "Servers" );
             }
-            for (i = 0; static_cast<int>(i) < F; i++) {
+            for (i = 0; i < gl->F; i++) {
                 sys->add_process( std::make_shared< process_t >()->add_thread( std::make_shared< supplier_thread >() ), "Suppliers" );
             }
             for (i = 0; i < gl->C; i++) {
@@ -171,9 +172,9 @@ class my_opt : public optimizer_t<int> {
             auto sim = std::make_shared< sim_help >( sys );
             auto monty = montecarlo_t::create(sim);
             monty->run();
-            return gl->a * F + gl->b * gl->get_montecarlo_avg();
+            return gl->a * gl->V + gl->b * gl->get_montecarlo_avg();
         }
-        my_opt(std::shared_ptr<requests_global> gl) : optimizer_t<int>(gl) {}
+        my_opt(std::shared_ptr<requests_global> gl) : optimizer_t<double>(gl) {}
 };
 
 int main()
@@ -181,16 +182,15 @@ int main()
     auto gl = std::make_shared< requests_global >(); //must not be redone
 
     auto sys = std::make_shared< system_t >( gl);
-    auto reader = lambda_parser("examples/example_01_26_4.txt", {
+    auto reader = lambda_parser("examples/example_01_26_5.txt", {
         {"A", [gl](auto& iss) { iss >> gl->A; }},
-        {"V", [gl](auto& iss) { iss >> gl->V; }},
         {"C", [gl](auto& iss) { iss >> gl->C; }},
         {"B", [gl](auto& iss) { iss >> gl->B; }},
         {"G", [gl](auto& iss) { double temp; iss >> temp; gl->set_optimizer_budget(temp); }},
         {"a", [gl](auto& iss) { iss >> gl->a; }},
         {"b", [gl](auto& iss) { iss >> gl->b; }},
-        {"W", [gl](auto& iss) { iss >> gl->W; }},
         {"P", [gl](auto& iss) { iss >> gl->P; }},
+        {"F", [gl](auto& iss) { iss >> gl->F; }},
         {"Q", [gl](auto& iss) { iss >> gl->Q; }},
         {"S", [gl](auto& iss) { iss >> gl->S; }},
         {"H", [gl](auto& iss) { double temp; iss >> temp; gl->set_horizon(temp); }},

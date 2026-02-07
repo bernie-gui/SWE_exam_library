@@ -26,6 +26,7 @@
  * Carlo methods.
  */
 #pragma once
+#include <algorithm>
 #include <cassert>
 #include <memory>
 #include <stdexcept>
@@ -45,7 +46,7 @@ namespace isw
      * @brief Abstract base class for optimization algorithms using Monte Carlo methods.
      * @details Provides framework for running optimization by sampling parameters and evaluating objective functions.
      */
-    template <typename n>
+    template <typename param_t = double, typename res_t = double>
     class optimizer_t
     {
     public:
@@ -64,7 +65,7 @@ namespace isw
          * @details This method must run the simulation and compute the objective value, storing it in global
          * optimizer_result.
          */
-        virtual n obj_fun( std::vector< n > &arguments ) = 0;
+        virtual res_t obj_fun( std::vector< param_t > &arguments ) = 0;
 
         /**
          * @brief Gets the global state, cast to type T.
@@ -87,17 +88,17 @@ namespace isw
          * @throws std::runtime_error If strategy is not implemented.
          * @details Samples random parameters within bounds, evaluates objective function, and tracks the best solution.
          */
-        void optimize( optimizer_strategy strategy, std::vector< n > min_solution, std::vector< n > max_solution ) {
+        void optimize( optimizer_strategy strategy, std::vector< param_t > min_solution, std::vector< param_t > max_solution ) {
             assert( min_solution.size() == max_solution.size() );
             size_t n_params = min_solution.size();
-            std::vector< n > arguments( n_params );
+            std::vector< param_t > arguments( n_params );
             auto random = _global->get_random();
             // sol parametro (argmuents)
             // obj è lo scalare (risltato di obj_fun che lui scrive in global optimizer result)
 
-            n best_obj_so_far = strategy == optimizer_strategy::MAXIMIZE ? std::numeric_limits< n >::lowest()
-                                                                            : std::numeric_limits< n >::max();
-            std::vector< n > best_sol_so_far( n_params );
+            res_t best_res_so_far = strategy == optimizer_strategy::MAXIMIZE ? std::numeric_limits< res_t >::lowest()
+                                                                            : std::numeric_limits< res_t >::max();
+            std::vector< param_t > best_param_so_far( n_params );
 
             for ( size_t i = 0; i < _global->optimizer_budget(); i++ )
             {
@@ -105,21 +106,21 @@ namespace isw
                 {
                     arguments[i] = random->uniform_range( min_solution[i], max_solution[i] );
                 }
-                n obj_resul = obj_fun( arguments );
+                res_t obj_resul = obj_fun( arguments );
                 switch ( strategy )
                 {
                     case optimizer_strategy::MINIMIZE:
-                        if ( obj_resul < best_obj_so_far )
+                        if ( obj_resul < best_res_so_far )
                         {
-                            best_sol_so_far = arguments;
-                            best_obj_so_far = obj_resul;
+                            best_param_so_far = arguments;
+                            best_res_so_far = obj_resul;
                         };
                         break;
                     case optimizer_strategy::MAXIMIZE:
-                        if ( obj_resul > best_obj_so_far )
+                        if ( obj_resul > best_res_so_far )
                         {
-                            best_sol_so_far = arguments;
-                            best_obj_so_far = obj_resul;
+                            best_param_so_far = arguments;
+                            best_res_so_far = obj_resul;
                         };
                         break;
                     default:
@@ -127,8 +128,10 @@ namespace isw
                 }
             }
             // Store best result found so far
-            _global->set_optimizer_result( best_obj_so_far );
-            _global->set_optimizer_optimal_parameters( best_sol_so_far );
+            std::vector<double> temp(best_param_so_far.size());
+            std::copy(best_param_so_far.begin(), best_param_so_far.end(), temp.begin());
+            _global->set_optimizer_result( static_cast<double>(best_res_so_far) );
+            _global->set_optimizer_optimal_parameters( temp );
         }
 
         /**
@@ -138,8 +141,8 @@ namespace isw
          * @param[in] max_solution Maximum bound.
          * @details Delegates to the vector version with single-element vectors.
          */
-        void optimize( optimizer_strategy strategy, n min_solution, n max_solution ) {
-            optimize( strategy, std::vector< n >( 1, min_solution ), std::vector< n >( 1, max_solution ) );
+        void optimize( optimizer_strategy strategy, param_t min_solution, param_t max_solution ) {
+            optimize( strategy, std::vector< param_t >( 1, min_solution ), std::vector< param_t >( 1, max_solution ) );
         }
 
     private:

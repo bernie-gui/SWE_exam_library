@@ -22,7 +22,7 @@ INCLUDES    := -I$(INC_DIR)
 ifeq ($(BUILD),debug)
   CXXFLAGS  := $(CXXSTD) $(WARNINGS) $(INCLUDES) -g -O0
 else ifeq ($(BUILD),use)
-  CXXFLAGS  := $(CXXSTD) $(WARNINGS) $(INCLUDES) -O3 -DNDEBUG
+  CXXFLAGS  := $(CXXSTD) $(WARNINGS) $(INCLUDES) -O3
 else
   $(error Unknown BUILD mode '$(BUILD)'. Use BUILD=debug or BUILD=use)
 endif
