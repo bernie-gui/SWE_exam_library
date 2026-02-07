@@ -46,7 +46,7 @@ namespace isw
      * @brief Abstract base class for optimization algorithms using Monte Carlo methods.
      * @details Provides framework for running optimization by sampling parameters and evaluating objective functions.
      */
-    template <typename param_t = double, typename res_t = double>
+    template <typename param_t = double>
     class optimizer_t
     {
     public:
@@ -65,7 +65,7 @@ namespace isw
          * @details This method must run the simulation and compute the objective value, storing it in global
          * optimizer_result.
          */
-        virtual res_t obj_fun( std::vector< param_t > &arguments ) = 0;
+        virtual double obj_fun( std::vector< param_t > &arguments ) = 0;
 
         /**
          * @brief Gets the global state, cast to type T.
@@ -96,8 +96,8 @@ namespace isw
             // sol parametro (argmuents)
             // obj è lo scalare (risltato di obj_fun che lui scrive in global optimizer result)
 
-            res_t best_res_so_far = strategy == optimizer_strategy::MAXIMIZE ? std::numeric_limits< res_t >::lowest()
-                                                                            : std::numeric_limits< res_t >::max();
+            double best_res_so_far = strategy == optimizer_strategy::MAXIMIZE ? std::numeric_limits< double >::lowest()
+                                                                            : std::numeric_limits< double >::max();
             std::vector< param_t > best_param_so_far( n_params );
 
             for ( size_t i = 0; i < _global->optimizer_budget(); i++ )
@@ -106,7 +106,7 @@ namespace isw
                 {
                     arguments[i] = random->uniform_range( min_solution[i], max_solution[i] );
                 }
-                res_t obj_resul = obj_fun( arguments );
+                double obj_resul = obj_fun( arguments );
                 switch ( strategy )
                 {
                     case optimizer_strategy::MINIMIZE:
@@ -130,7 +130,7 @@ namespace isw
             // Store best result found so far
             std::vector<double> temp(best_param_so_far.size());
             std::copy(best_param_so_far.begin(), best_param_so_far.end(), temp.begin());
-            _global->set_optimizer_result( static_cast<double>(best_res_so_far) );
+            _global->set_optimizer_result( best_res_so_far );
             _global->set_optimizer_optimal_parameters( temp );
         }
 
