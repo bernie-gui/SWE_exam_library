@@ -28,8 +28,9 @@
 #pragma once
 #include <cassert>
 #include <memory>
+#include <stdexcept>
 #include <vector>
-#include "montecarlo.hpp"
+#include "global.hpp"
 
 namespace isw
 {
@@ -44,6 +45,7 @@ namespace isw
      * @brief Abstract base class for optimization algorithms using Monte Carlo methods.
      * @details Provides framework for running optimization by sampling parameters and evaluating objective functions.
      */
+    template <typename n>
     class optimizer_t
     {
     public:
@@ -51,7 +53,7 @@ namespace isw
          * @brief Constructor.
          * @param[in] montecarlo Shared pointer to the Monte Carlo simulator.
          */
-        optimizer_t( std::shared_ptr< global_t > global );
+        optimizer_t( std::shared_ptr< global_t > global ) : _global( global ) {};
 
         /*
          * This must run the simulation and make the calculations
@@ -62,7 +64,7 @@ namespace isw
          * @details This method must run the simulation and compute the objective value, storing it in global
          * optimizer_result.
          */
-        virtual double obj_fun( std::vector< double > &arguments ) = 0;
+        virtual n obj_fun( std::vector< n > &arguments ) = 0;
 
         /**
          * @brief Gets the global state, cast to type T.
@@ -85,8 +87,49 @@ namespace isw
          * @throws std::runtime_error If strategy is not implemented.
          * @details Samples random parameters within bounds, evaluates objective function, and tracks the best solution.
          */
-        void optimize( optimizer_strategy strategy, std::vector< double > min_solution,
-                       std::vector< double > max_solution );
+        void optimize( optimizer_strategy strategy, std::vector< n > min_solution, std::vector< n > max_solution ) {
+            assert( min_solution.size() == max_solution.size() );
+            size_t n_params = min_solution.size();
+            std::vector< n > arguments( n_params );
+            auto random = _global->get_random();
+            // sol parametro (argmuents)
+            // obj è lo scalare (risltato di obj_fun che lui scrive in global optimizer result)
+
+            n best_obj_so_far = strategy == optimizer_strategy::MAXIMIZE ? std::numeric_limits< n >::lowest()
+                                                                            : std::numeric_limits< n >::max();
+            std::vector< n > best_sol_so_far( n_params );
+
+            for ( size_t i = 0; i < _global->optimizer_budget(); i++ )
+            {
+                for ( size_t i = 0; i < n_params; i++ )
+                {
+                    arguments[i] = random->uniform_range( min_solution[i], max_solution[i] );
+                }
+                n obj_resul = obj_fun( arguments );
+                switch ( strategy )
+                {
+                    case optimizer_strategy::MINIMIZE:
+                        if ( obj_resul < best_obj_so_far )
+                        {
+                            best_sol_so_far = arguments;
+                            best_obj_so_far = obj_resul;
+                        };
+                        break;
+                    case optimizer_strategy::MAXIMIZE:
+                        if ( obj_resul > best_obj_so_far )
+                        {
+                            best_sol_so_far = arguments;
+                            best_obj_so_far = obj_resul;
+                        };
+                        break;
+                    default:
+                        throw std::runtime_error( "not implemented" );
+                }
+            }
+            // Store best result found so far
+            _global->set_optimizer_result( best_obj_so_far );
+            _global->set_optimizer_optimal_parameters( best_sol_so_far );
+        }
 
         /**
          * @brief Runs the optimization process for single-dimensional parameter.
@@ -95,7 +138,9 @@ namespace isw
          * @param[in] max_solution Maximum bound.
          * @details Delegates to the vector version with single-element vectors.
          */
-        void optimize( optimizer_strategy strategy, double min_solution, double max_solution );
+        void optimize( optimizer_strategy strategy, n min_solution, n max_solution ) {
+            optimize( strategy, std::vector< n >( 1, min_solution ), std::vector< n >( 1, max_solution ) );
+        }
 
     private:
         /** @brief The Monte Carlo simulator instance. */
