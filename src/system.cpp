@@ -87,7 +87,9 @@ void system_t::_update_time()
 void system_t::step()
 {
     _update_time();
-    for ( auto &proc : _processes ) {
+    auto shuffled = _processes;
+    std::shuffle( shuffled.begin(), shuffled.end(), _global->get_random()->get_engine() );
+    for ( auto &proc : shuffled ) {
 	   	if (!proc->is_active())
 	    		continue;
         proc->schedule( _time );

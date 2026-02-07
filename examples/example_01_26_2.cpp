@@ -1,5 +1,7 @@
 #include <cstddef>
+#include <cstring>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -14,7 +16,8 @@ using namespace isw;
 class uav_global : public global_t
 {
 public:
-    double A, L, T, V, R, D, last_collsion = 0, rate = 0;
+    double A, L, T, V, R, D, N,
+        last_collsion = 0, rate = 0;
     void init() override {
         global_t::init();
         last_collsion = 0;
@@ -43,23 +46,54 @@ public:
 class uav_thread : public thread_t
 {
 private:
-    static double prob( int k, std::shared_ptr< uav > p, std::shared_ptr< uav_global > gl )
-    {
-        return std::exp( -gl->A * ( p->pos[k] + gl->L ) / 2 * gl->L );
+    inline double d(double *test) {
+        auto gl = get_global< uav_global >();
+        auto procs = get_process()->get_system()->get_processes< uav >("UAVs");
+        double add, ret = 0;
+        for (auto &p : procs) {
+            if (p->get_id() == get_process()->get_id()) continue;
+            for (size_t k = 0; k < 3; k++) {
+                add = (test[k] - p->pos[k]) / (2 * gl->L);
+                add *= add;
+                ret += add;
+            }
+        }
+        return ret;
+    }
+    void backtrack(double *vel2, double *pos, double t, 
+            double *best, double *best_obj, size_t i = 0) { //generalize
+        if (i == 3) { //terminal function
+            double test[3];
+            for (size_t j = 0; j < 3; j++) 
+                test[j] = pos[j] + vel2[j] * t;
+            double temp = d(test); //function call
+            if (temp < *best) {
+                *best = temp;
+                memcpy(best_obj, vel2, 3 * sizeof(double));
+            }
+            return;
+        }
+        vel2[i] *= -1; //iterate over values
+        backtrack(vel2, pos, t, best, best_obj, i+1);
+        vel2[i] *= -1;
+        backtrack(vel2, pos, t, best, best_obj, i+1);
+    }
+
+    inline void minimize(double *pos, double t, double *res) { //argmin (for discrete values) ritorna insieme!!!
+        auto gl = get_global< uav_global >();
+        double best = std::numeric_limits<double>::infinity();
+        double vel2[] = {gl->V, gl->V, gl->V};
+        backtrack(vel2, pos, t, &best, res);
     }
 
 public:
-    void fun() override
+    void fun() override //policy
     {
         auto gl = get_global< uav_global >();
         auto p = get_process< uav >();
-        double pb;
         for ( int i = 0; i < 3; i++ )
-        {
             p->pos[i] += p->vel[i] * gl->T;
-            pb = prob( i, p, gl );
-            p->vel[i] = gl->get_random()->uniform_range( 0.0, 1.0 ) < pb ? gl->V : -gl->V;
-        }
+        minimize(p->pos, gl->T, p->vel);
     }
     void init() override
     {
@@ -101,7 +135,7 @@ public:
                 collisions[id1][id2] = true;
                 collsion_count++;
             }
-        gl->rate = gl->rate * ( gl->last_collsion / get_thread_time() ) + collsion_count / get_thread_time();
+        gl->rate = gl->rate * ( gl->last_collsion / get_thread_time() ) + collsion_count / get_thread_time(); //rate formula
         gl->last_collsion = get_thread_time();
     }
     void init() override
@@ -127,8 +161,7 @@ int main()
 {
     auto gl = std::make_shared< uav_global >();
     auto sys = std::make_shared< system_t >( gl);
-    size_t N;
-    auto reader = lambda_parser("bins/example_01_26_1.txt", {
+    auto reader = lambda_parser("examples/example_01_26_1.txt", {
         {"A", [gl](auto& iss) { iss >> gl->A; }},
         {"L", [gl](auto& iss) { iss >> gl->L; }},
         {"V", [gl](auto& iss) { iss >> gl->V; }},
@@ -136,11 +169,11 @@ int main()
         {"D", [gl](auto& iss) { iss >> gl->D; }},
         {"T", [gl](auto& iss) { iss >> gl->T; }},
         {"H", [gl](auto& iss) { double temp; iss >> temp; gl->set_horizon(temp); }},
-        {"N", [&N](auto& iss) { iss >> N; }},
+        {"N", [gl](auto& iss) { iss >> gl->N; }},
         {"M", [gl](auto& iss) { double temp; iss >> temp; gl->set_montecarlo_budget(temp); }}}
     );
     reader.parse();
-    for ( size_t i = 0; i < N; i++ ) {
+    for ( size_t i = 0; i < gl->N; i++ ) {
         sys->add_process( std::make_shared< uav >()->add_thread( std::make_shared< uav_thread >() ), "UAVs" );
     }
     sys->add_process(

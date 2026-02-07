@@ -43,7 +43,7 @@ namespace isw::network
         double timestamp;               /**< @brief Time when the message was sent. */
         size_t sender;                  /**< @brief ID of the sending process. */
         size_t sender_rel;				/**< @brief Relative ID of the sending process. */
-        world_key_t world_key;        	/**< @brief Key identifying the world context of the message. */
+        world_key_t world_key;        	/**< @brief World key of the sending process. */
     };
 
     /** @brief Type alias for a message channel, implemented as a queue of shared pointers to messages. */

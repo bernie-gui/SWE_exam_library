@@ -22,7 +22,7 @@ public:
     }
 };
 
-class uav : public process_t //generalize
+class uav : public process_t //generalize (multi dimesional)
 {
 public:
     double pos[3], vel[3];
@@ -45,11 +45,11 @@ class uav_thread : public thread_t
 private:
     static double prob( int k, std::shared_ptr< uav > p, std::shared_ptr< uav_global > gl )
     {
-        return std::exp( -gl->A * ( p->pos[k] + gl->L ) / 2 * gl->L );
+        return std::exp( -gl->A * ( p->pos[k] + gl->L ) / (2 * gl->L) );
     }
 
 public:
-    void fun() override
+    void fun() override //generalize policy
     {
         auto gl = get_global< uav_global >();
         auto p = get_process< uav >();
@@ -69,7 +69,7 @@ public:
     }
 };
 
-class coll_det_thread : public thread_t // generalize
+class coll_det_thread : public thread_t // generalize (euclidean distance)
 {
 public:
     void fun() override
@@ -126,7 +126,7 @@ class my_sim : public simulator_t {
 int main()
 {
     auto gl = std::make_shared< uav_global >();
-    auto sys = std::make_shared< system_t >( gl);
+    auto sys = system_t::create( gl); //why create???
     size_t N;
     auto reader = lambda_parser("examples/example_01_26_1.txt", {
         {"A", [gl](auto& iss) { iss >> gl->A; }},
