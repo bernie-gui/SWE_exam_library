@@ -1,16 +1,19 @@
 #include <cstddef>
 #include <cstring>
+#include <functional>
 #include <iostream>
-#include <limits>
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
+#include <vector>
 #include "global.hpp"
 #include "io/input_parser.hpp"
 #include "montecarlo.hpp"
 #include "process.hpp"
 #include "simulator.hpp"
 #include "system.hpp"
+#include "utils/backtracking.hpp"
 using namespace isw;
 
 class uav_global : public global_t
@@ -45,47 +48,6 @@ public:
 
 class uav_thread : public thread_t
 {
-private:
-    inline double d(double *test) {
-        auto gl = get_global< uav_global >();
-        auto procs = get_process()->get_system()->get_processes< uav >("UAVs");
-        double add, ret = 0;
-        for (auto &p : procs) {
-            if (p->get_id() == get_process()->get_id()) continue;
-            for (size_t k = 0; k < 3; k++) {
-                add = (test[k] - p->pos[k]) / (2 * gl->L);
-                add *= add;
-                ret += add;
-            }
-        }
-        return ret;
-    }
-    void backtrack(double *vel2, double *pos, double t, 
-            double *best, double *best_obj, size_t i = 0) { //generalize
-        if (i == 3) { //terminal function
-            double test[3];
-            for (size_t j = 0; j < 3; j++) 
-                test[j] = pos[j] + vel2[j] * t;
-            double temp = d(test); //function call
-            if (temp < *best) {
-                *best = temp;
-                memcpy(best_obj, vel2, 3 * sizeof(double));
-            }
-            return;
-        }
-        vel2[i] *= -1; //iterate over values
-        backtrack(vel2, pos, t, best, best_obj, i+1);
-        vel2[i] *= -1;
-        backtrack(vel2, pos, t, best, best_obj, i+1);
-    }
-
-    inline void minimize(double *pos, double t, double *res) { //argmin (for discrete values) ritorna insieme!!!
-        auto gl = get_global< uav_global >();
-        double best = std::numeric_limits<double>::infinity();
-        double vel2[] = {gl->V, gl->V, gl->V};
-        backtrack(vel2, pos, t, &best, res);
-    }
-
 public:
     void fun() override //policy
     {
@@ -93,7 +55,26 @@ public:
         auto p = get_process< uav >();
         for ( int i = 0; i < 3; i++ )
             p->pos[i] += p->vel[i] * gl->T;
-        minimize(p->pos, gl->T, p->vel);
+        std::unordered_set<double> x = { gl->V, -gl->V };
+        std::function<double(std::shared_ptr<std::vector<double>>)> f = [this](auto v) {
+            auto gl = this->get_global<uav_global>();
+            auto procs = get_process()->get_system()->get_processes< uav >("UAVs");
+            auto uavv = this->get_process<uav>();
+            double add, ret = 0;
+            for (auto &p : procs) {
+                if (p->get_id() == get_process()->get_id()) continue;
+                for (size_t k = 0; k < 3; k++) {
+                    add = ((uavv->pos[k] + (*v)[k] * gl->T) - p->pos[k]) / (2 * gl->L);
+                    add *= add;
+                    ret += add;
+                }
+            }
+            return ret;
+        };
+        auto pool = arg_min_max({x, x, x}, f, backtrack::arg_strat::MIN);
+        auto it = backtrack::get_unif_random(pool, gl->get_random()->get_engine());
+        for (size_t i = 0; i < 3; i++)
+            p->vel[i] = (*it)[i];
     }
     void init() override
     {
