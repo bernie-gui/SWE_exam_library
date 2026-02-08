@@ -5,7 +5,7 @@
 #include <memory>
 #include <ostream>
 #include <stdexcept>
-#include <map>
+#include <unordered_map>
 #include <algorithm>
 #include <utility>
 #include <vector>
@@ -71,9 +71,18 @@ class server_thread : public thread_t {
         server_thread() : thread_t(0.1, 0.2) {} // da rivedere sta cosa
 };
 
+struct pair_hash {
+    size_t operator()(const std::pair<size_t, size_t>& p) const noexcept {
+        size_t ret = 31;
+        ret = (ret + std::hash<size_t>()(p.first)) * 31;
+        ret = (ret + std::hash<size_t>()(p.second)) * 31;
+        return ret;
+    }
+};
+
 class cust : public process_t {
     public:
-        std::multimap<std::pair<size_t, size_t>, size_t> request_history;
+        std::unordered_multimap<std::pair<size_t, size_t>, size_t, pair_hash> request_history;
         void init() override {
             process_t::init();
             request_history.clear();
