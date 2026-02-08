@@ -14,7 +14,6 @@
 #include "process.hpp"
 #include "simulator.hpp"
 #include "system.hpp"
-#include "utils/hashing.hpp"
 using namespace isw;
 
 class requests_global : public global_t {

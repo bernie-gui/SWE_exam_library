@@ -28,6 +28,7 @@
 
 #include <cstdint>
 #include <string>
+#include ".base/hashing.hpp"
 /*
  * TYPES DEFINITIONs
  */

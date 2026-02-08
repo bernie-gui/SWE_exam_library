@@ -2,6 +2,7 @@
 
 #include <functional>
 
+// TODO: documentation
 template<>
 struct std::hash<std::pair<size_t, size_t>> {
      size_t operator()(const std::pair<size_t, size_t>& p) const noexcept {
