@@ -1,4 +1,6 @@
 #pragma once
+
+#include ".base/hashing.hpp"
 #include <cstddef>
 #include <functional>
 #include <limits>
@@ -9,7 +11,7 @@
 
 // TODO: documentation
 namespace isw {
-    
+
     enum class arg_strat {
         MIN, MAX
     };
@@ -38,7 +40,7 @@ namespace isw {
         param_t val;
         couple<param_t, res_t> temp = info;
         for (val = ranges[i].first; val <= ranges[i].second; val++) {
-            ancilla[i] = val;
+            (*ancilla)[i] = val;
             temp = backtrack(ranges, ancilla, strategy, temp, f, i + 1);
         }
         return temp;
