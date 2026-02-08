@@ -71,8 +71,8 @@ public:
             }
             return ret;
         };
-        auto pool = arg_min_max({x, x, x}, f, backtrack::arg_strat::MIN);
-        auto it = backtrack::get_unif_random(pool, gl->get_random()->get_engine());
+        auto pool = arg_min_max({x, x, x}, f, utils::arg_strat::MIN);
+        auto it = utils::get_unif_random(pool, gl->get_random()->get_engine());
         for (size_t i = 0; i < 3; i++)
             p->vel[i] = (*it)[i];
     }
