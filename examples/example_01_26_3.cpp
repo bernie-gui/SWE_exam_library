@@ -14,16 +14,17 @@
 #include "process.hpp"
 #include "simulator.hpp"
 #include "system.hpp"
+#include "utils/rate.hpp"
 using namespace isw;
 
 class requests_global : public global_t {
     public:
         size_t Q, P, S, C;
-        double A, B, W, V, F,
-            last_time = 0, rate = 0;
+        double A, B, W, V, F;
+        utils::rate_meas_t measure;
         void init() override {
             global_t::init();
-            last_time = rate = 0;
+            measure.init();
         }
 };
 
@@ -110,8 +111,7 @@ class cust_thread_2 : public thread_t {
             auto i = p->request_history.find({msg->sender_rel, msg->item});
             if (i != p->request_history.end()) {
                 if (quant < i->second) {
-                    gl->rate = gl->rate * gl->last_time / get_thread_time() + 1 / get_thread_time();
-                    gl->last_time = get_thread_time();
+                    gl->measure.update(1, get_thread_time());
                 }
                 p->request_history.erase(i);
             }
@@ -143,7 +143,7 @@ class sim_help : public simulator_t {
     public:
         void on_terminate() override {
             auto gl = get_global<requests_global>();
-            gl->set_montecarlo_current(gl->rate);
+            gl->set_montecarlo_current(gl->measure.get_rate());
         }
         sim_help(std::shared_ptr<system_t> s) : simulator_t(s) {}
 };

@@ -14,17 +14,17 @@
 #include "simulator.hpp"
 #include "system.hpp"
 #include "utils/backtracking.hpp"
+#include "utils/rate.hpp"
 using namespace isw;
 
 class uav_global : public global_t
 {
 public:
-    double A, L, T, V, R, D, N,
-        last_collsion = 0, rate = 0;
+    double A, L, T, V, R, D, N;
+    utils::rate_meas_t measure;
     void init() override {
         global_t::init();
-        last_collsion = 0;
-        rate = 0;
+        measure.init();
     }
 };
 
@@ -116,8 +116,7 @@ public:
                 collisions[id1][id2] = true;
                 collsion_count++;
             }
-        gl->rate = gl->rate * ( gl->last_collsion / get_thread_time() ) + collsion_count / get_thread_time(); //rate formula
-        gl->last_collsion = get_thread_time();
+        gl->measure.update(collsion_count, get_thread_time());
     }
     void init() override
     {
@@ -132,7 +131,7 @@ class my_sim : public simulator_t {
     public:
         void on_terminate() override {
             auto gl = get_global<uav_global>();
-            gl->set_montecarlo_current(gl->rate);
+            gl->set_montecarlo_current(gl->measure.get_rate());
         }
 
         my_sim(std::shared_ptr<system_t> sys) : simulator_t(sys) {} 
