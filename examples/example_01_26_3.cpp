@@ -52,9 +52,11 @@ class server_thread : public thread_t {
             sys_msg ret;
             size_t copy;
             auto p = get_process< server >();
+            auto gl = get_global< requests_global >();
             if ((msg = receive_message< sys_msg >()) == nullptr) return;
             if (msg->world_key == "Customers") {
                 copy = std::min(p->DB[msg->item], msg->quant);
+                if (copy < msg->quant) gl->measure.update(1, get_thread_time());
                 p->DB[msg->item] -= copy;
                 ret.quant = copy;
                 ret.item = msg->item;
@@ -105,14 +107,14 @@ class cust_thread_2 : public thread_t {
             std::shared_ptr<sys_msg> msg;
             auto p = get_process<cust>();
             auto gl = get_global<requests_global>();
-            size_t quant;
+            // size_t quant;
             if ((msg = receive_message<sys_msg>()) == nullptr) return;
-            quant = msg->quant;
+            // quant = msg->quant;
             auto i = p->request_history.find({msg->sender_rel, msg->item});
             if (i != p->request_history.end()) {
-                if (quant < i->second) {
-                    gl->measure.update(1, get_thread_time());
-                }
+                // if (quant < i->second) {
+                //     gl->measure.update(1, get_thread_time());
+                // }
                 p->request_history.erase(i);
             }
             else throw std::runtime_error(" unknown sender ");
@@ -176,7 +178,7 @@ int main()
     for (i = 0; i < gl->C; i++) {
         sys->add_process( std::make_shared< cust >()->add_thread( std::make_shared< cust_thread_1 >() )->add_thread(std::make_shared<cust_thread_2>()), "Customers" );
     }
-    sys->add_pid_network();
+    sys->add_network();
 
     auto sim = std::make_shared< sim_help >( sys );
 

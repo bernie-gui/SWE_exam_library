@@ -38,7 +38,7 @@ namespace isw
     constexpr double KD = 0.01;
     constexpr double DV_ALPHA = 0.2;
     constexpr double ERROR_THRESHOLD = 0.1;
-    
+
     /**
      * @brief Thread responsible for scanning processes and dispatching messages between them.
      * @details This class implements a message passing mechanism where it randomly selects processes
