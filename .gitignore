@@ -1,7 +1,7 @@
 build/
 .cache/
 main
-*.txt
+# *.txt
 bins/*
 
 # Prerequisites
