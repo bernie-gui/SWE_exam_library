@@ -6,7 +6,7 @@ TARGET      := main
 SRC_DIR     := src
 INC_DIR     := include
 BUILD_DIR   := build
-BINS_DIR    := bins
+BINS_DIR    := example_bins
 
 # Tools
 CXX         := g++
@@ -92,6 +92,7 @@ $(EX_OBJ_DIR)/%.o: $(EXAMPLES_DIR)/%.cpp | $(EX_OBJ_DIR)
 
 # Link example binaries (in bins directory)
 $(BINS_DIR)/%: $(EX_OBJ_DIR)/%.o $(OBJ_FILES)
+	@mkdir -p $(dir $@)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
 # Ensure build directories exist
@@ -100,9 +101,6 @@ $(BUILD_DIR):
 
 $(EX_OBJ_DIR):
 	mkdir -p $(EX_OBJ_DIR)
-
-$(BINS_DIR):
-	mkdir -p $(BINS_DIR)
 
 # Convenience targets
 .PHONY: debug use clean examples

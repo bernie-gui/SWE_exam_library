@@ -2,7 +2,7 @@ build/
 .cache/
 main
 # *.txt
-bins/*
+example_bins/
 
 # Prerequisites
 *.d
