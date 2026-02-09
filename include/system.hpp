@@ -92,6 +92,8 @@ namespace isw
          * @return Shared pointer to this system.
          */
         std::shared_ptr< system_t > add_network( std::shared_ptr< network_t > net );
+        // TODO: add documentation
+        std::shared_ptr< system_t > add_pid_network( double obj_occupancy = 1, double th_time = 0.0 );
         /**
          * @brief Registers a process to a specific world.
          * @param[in] p Shared pointer to the process.

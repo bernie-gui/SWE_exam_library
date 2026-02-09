@@ -26,11 +26,10 @@
  */
 #pragma once
 
-#include <cstddef>
 #include "network/network.hpp"
 
 // TODO: documentation
-namespace isw::network
+namespace isw
 {
     constexpr double S_TIME_MIN = 0;
     constexpr double S_TIME_MAX = 1800;
@@ -52,7 +51,7 @@ namespace isw::network
          * @brief Constructs a pid-scanner thread with specified timing parameters.
          * @param[in] th_time Thread time, defaults to 0.0.
          */
-        pid_scanner_t( double obj_occupancy, double th_time = 0.0 );
+        pid_scanner_t( double obj_occupancy = 1, double th_time = 0.0 );
         virtual void on_start_scan() override;
         /**
          * @brief Initializes the scanner with the current list of processes.
