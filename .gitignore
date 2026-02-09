@@ -1,12 +1,8 @@
 build/
 .cache/
 main
-results.txt
-parameters.txt
-gauss_out.txt
-
-example-*
-!examples/*
+*.txt
+bins/*
 
 # Prerequisites
 *.d
