@@ -34,10 +34,11 @@ namespace isw::network
 {
     constexpr double S_TIME_MIN = 0;
     constexpr double S_TIME_MAX = 1800;
-    constexpr double KP = 0.10;
+    constexpr double KP = 0.1;
     constexpr double KI = 0.05;
     constexpr double KD = 0.01;
     constexpr double DV_ALPHA = 0.2;
+    constexpr double ERROR_THRESHOLD = 0.1;
     
     /**
      * @brief Thread responsible for scanning processes and dispatching messages between them.
@@ -61,6 +62,6 @@ namespace isw::network
 
     protected:
         double _obj_occupancy, _integral, 
-            _prev_meas, _prev_dv;
+            _prev_error, _prev_dv, _last_time;
     };
 }
