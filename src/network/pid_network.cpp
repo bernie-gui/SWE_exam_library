@@ -1,5 +1,5 @@
 /*
- * File: pid-network.hpp
+ * File: pid_network.cpp
  * Copyright (c) 2025 bernie_gui, uniquadev, SepeFr.
  *
  * This file is part of SWE_exam_library
@@ -22,6 +22,19 @@
  * Academic Year: 2025-2026
  *
  * Description:
- *	This header file defines the pid-network_t class and pid-scanner_t thread for network operations in the simulation system.
+ *	This file implements the pid_scanner_t thread for network operations.
  */
- #pragma once
+#include "network/pid_network.hpp"
+#include "network/network.hpp"
+using namespace isw::network;
+
+pid_scanner_t::pid_scanner_t(double obj_occupancy, double th_time) : scanner_t(0, S_TIME_MIN, th_time), 
+    _obj_occupancy(obj_occupancy), _integral(0), _prev_meas(0), _prev_dv(0) {}
+
+void pid_scanner_t::on_start_scan() {
+
+}
+
+void pid_scanner_t::init() {
+
+}

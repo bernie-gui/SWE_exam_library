@@ -1,5 +1,5 @@
 /*
- * File: network.hpp
+ * File: pid_network.hpp
  * Copyright (c) 2025 bernie_gui, uniquadev, SepeFr.
  *
  * This file is part of SWE_exam_library
@@ -22,46 +22,37 @@
  * Academic Year: 2025-2026
  *
  * Description:
- *	This header file defines the network_t class and scanner_t thread for network operations in the simulation system.
+ *	This header file defines the pid_scanner_t thread for network operations in the simulation system.
  */
 #pragma once
 
-#include <vector>
-#include "process.hpp"
+#include <cstddef>
+#include "network/network.hpp"
 
-namespace isw
+// TODO: documentation
+namespace isw::network
 {
-    /**
-     * @brief Represents a network process in the simulation system.
-     */
-    class network_t : public isw::process_t
-    {
-    };
-
+    constexpr double S_TIME_MIN = 0;
+    constexpr double S_TIME_MAX = 1800;
+    constexpr double KP = 0.10;
+    constexpr double KI = 0.05;
+    constexpr double KD = 0.01;
+    constexpr double DV_ALPHA = 0.2;
+    
     /**
      * @brief Thread responsible for scanning processes and dispatching messages between them.
      * @details This class implements a message passing mechanism where it randomly selects processes
      * to check for outgoing messages and forwards them to the appropriate input channels.
      */
-    class scanner_t : public isw::thread_t
+    class pid_scanner_t : public scanner_t
     {
     public:
         /**
-         * @brief Constructs a scanner thread with specified timing parameters.
-         * @param[in] c_time Creation time.
-         * @param[in] s_time Start time.
+         * @brief Constructs a pid-scanner thread with specified timing parameters.
          * @param[in] th_time Thread time, defaults to 0.0.
          */
-        scanner_t( double c_time, double s_time, double th_time = 0.0 );
-        /**
-         * @brief Executes the scanning and message dispatching logic.
-         * @details Randomly shuffles the process list when all have been scanned, then selects the next process,
-         * checks its output channel, and if a message is present, forwards it to the receiver's input channel.
-         * Rebuilds the scanner list if the number of processes has changed.
-         */
-        virtual void fun() override;
-        virtual void on_start_scan();
-        virtual bool filter(network::channel_t &current_channel);
+        pid_scanner_t( double obj_occupancy, double th_time = 0.0 );
+        virtual void on_start_scan() override;
         /**
          * @brief Initializes the scanner with the current list of processes.
          * @details Populates the _scanner vector with indices from 0 to processes.size()-1 and sets _current to 0.
@@ -69,9 +60,7 @@ namespace isw
         virtual void init() override;
 
     protected:
-        /** @brief List of process indices to scan. */
-        std::vector< size_t > _scanner;
-        /** @brief Current index in the scanner list. */
-        size_t _current; // scanned_idx
+        double _obj_occupancy, _integral, 
+            _prev_meas, _prev_dv;
     };
 }

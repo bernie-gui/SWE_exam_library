@@ -75,7 +75,7 @@ void scanner_t::fun()
     _current++;
 
     auto &current_channel = global->get_channel_out()[sched];
-    if ( current_channel.empty() && filter( current_channel ) )
+    if ( current_channel.empty() || filter( current_channel ) )
         return;
 
     auto msg = current_channel.front();
@@ -89,4 +89,4 @@ void scanner_t::fun()
 
 void scanner_t::on_start_scan() {}
 
-bool scanner_t::filter( network::channel_t & /*current_channel*/ ) { return true; }
+bool scanner_t::filter( network::channel_t & /*current_channel*/ ) { return false; }
