@@ -24,22 +24,31 @@
  * Description:
  *	This header file defines common types and utilities used throughout the simulation library.
  */
-#pragma once
+#include "io/lambda_parser.hpp"
+using namespace isw;
 
-// TODO: documentation
-namespace isw::utils {
+lambda_parser::lambda_parser( const std::filesystem::path &path, const std::unordered_map< std::string, Parser > &bindings ):
+    input_parser_t( path ), _bindings( bindings ) {}
 
-    class rate_meas_t {
-        public:
-            rate_meas_t();
+lambda_parser::lambda_parser( const std::filesystem::path &path, std::unordered_map< std::string, Parser > &&bindings ):
+    input_parser_t( path ), _bindings( std::move( bindings ) ) {}
 
-            void update(double amount, double time);
-
-            double get_rate();
-
-            void init();
-
-        private:
-            double _rate, _last_time;
-    };
+void lambda_parser::parse() {
+    std::string line;
+    std::istringstream iss;
+    std::string key;
+    while(std::getline(get_stream(), line)) {
+        iss = std::istringstream(line);
+        iss >> key;
+        auto it = _bindings.find(key);
+        if (it != _bindings.end()) {
+            auto& parser = it->second;
+            parser(iss);
+        }
+        else {
+            std::string err(" unknown input specified: ");
+            err += key;
+            throw std::runtime_error(err);
+        }
+    }
 }

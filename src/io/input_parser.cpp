@@ -60,29 +60,3 @@ input_parser_t::~input_parser_t()
         _stream.close();
     }
 }
-
-lambda_parser::lambda_parser( const std::filesystem::path &path, const std::unordered_map< std::string, Parser > &bindings ):
-    input_parser_t( path ), _bindings( bindings ) {}
-
-lambda_parser::lambda_parser( const std::filesystem::path &path, std::unordered_map< std::string, Parser > &&bindings ):
-    input_parser_t( path ), _bindings( std::move( bindings ) ) {}
-
-void lambda_parser::parse() {
-    std::string line;
-    std::istringstream iss;
-    std::string key;
-    while(std::getline(get_stream(), line)) {
-        iss = std::istringstream(line);
-        iss >> key;
-        auto it = _bindings.find(key);
-        if (it != _bindings.end()) {
-            auto& parser = it->second;
-            parser(iss);
-        }
-        else {
-            std::string err(" unknown input specified: ");
-            err += key;
-            throw std::runtime_error(err);
-        }
-    }
-}

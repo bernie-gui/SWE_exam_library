@@ -4,7 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include "global.hpp"
-#include "io/input_parser.hpp"
+#include "io/lambda_parser.hpp"
 #include "montecarlo.hpp"
 #include "process.hpp"
 #include "simulator.hpp"

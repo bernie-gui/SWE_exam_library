@@ -1,14 +1,41 @@
+/*
+ * File: common.hpp
+ * Copyright (c) 2025 bernie_gui, uniquadev, SepeFr.
+ *
+ * This file is part of SWE_exam_library
+ *
+ * SWE_exam_library is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * SWE_exam_library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * University: Sapienza University of Rome
+ * Instructor: Enrico Tronci
+ * Academic Year: 2025-2026
+ *
+ * Description:
+ *	This header file defines common types and utilities used throughout the simulation library.
+ */
 #include "utils/rate.hpp"
+using namespace isw;
 
-isw::utils::rate_meas_t::rate_meas_t(): _rate(0), _last_time(0) {}
+utils::rate_meas_t::rate_meas_t(): _rate(0), _last_time(0) {}
 
-void isw::utils::rate_meas_t::update(double amount, double time) {
+void utils::rate_meas_t::update(double amount, double time) {
     _rate = _rate * ( _last_time / time ) + amount / time;
     _last_time = time;
 }
 
-void isw::utils::rate_meas_t::init() {
+void utils::rate_meas_t::init() {
     _rate = _last_time = 0;
 }
 
-double isw::utils::rate_meas_t::get_rate() {return _rate;}
+double utils::rate_meas_t::get_rate() {return _rate;}
