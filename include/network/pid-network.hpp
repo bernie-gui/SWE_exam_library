@@ -1,5 +1,5 @@
 /*
- * File: rate.cpp
+ * File: pid-network.hpp
  * Copyright (c) 2025 bernie_gui, uniquadev, SepeFr.
  *
  * This file is part of SWE_exam_library
@@ -22,20 +22,6 @@
  * Academic Year: 2025-2026
  *
  * Description:
- *	This file implements the rate_meas_t class methods for rate measurements in the simulation system.
+ *	This header file defines the pid-network_t class and pid-scanner_t thread for network operations in the simulation system.
  */
-#include "utils/rate.hpp"
-using namespace isw;
-
-utils::rate_meas_t::rate_meas_t(): _rate(0), _last_time(0) {}
-
-void utils::rate_meas_t::update(double amount, double time) {
-    _rate = _rate * ( _last_time / time ) + amount / time;
-    _last_time = time;
-}
-
-void utils::rate_meas_t::init() {
-    _rate = _last_time = 0;
-}
-
-double utils::rate_meas_t::get_rate() {return _rate;}
+ #pragma once

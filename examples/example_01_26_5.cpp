@@ -181,7 +181,7 @@ int main()
     auto gl = std::make_shared< requests_global >(); //must not be redone
 
     auto sys = std::make_shared< system_t >( gl);
-    auto reader = lambda_parser("examples/example_01_26_5.txt", {
+    auto reader = lambda_parser_t("examples/example_01_26_5.txt", {
         {"A", [gl](auto& iss) { iss >> gl->A; }},
         {"C", [gl](auto& iss) { iss >> gl->C; }},
         {"B", [gl](auto& iss) { iss >> gl->B; }},

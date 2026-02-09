@@ -1,5 +1,5 @@
 /*
- * File: common.hpp
+ * File: lambda_parser.hpp
  * Copyright (c) 2025 bernie_gui, uniquadev, SepeFr.
  *
  * This file is part of SWE_exam_library
@@ -22,7 +22,7 @@
  * Academic Year: 2025-2026
  *
  * Description:
- *	This header file defines common types and utilities used throughout the simulation library.
+ *	This header file defines the lambda_parser_t class for fast-implemantable parsing.
  */
 #pragma once
 
@@ -38,7 +38,7 @@ namespace isw {
      * @brief Input parser implementation using lambdas.
      * @details Operates on key - value maps of types <std::string, Parser>.
      */    
-    class lambda_parser : public input_parser_t {
+    class lambda_parser_t : public input_parser_t {
         public:
             /**
             * @brief Constructor.
@@ -46,14 +46,14 @@ namespace isw {
             * @param[in] bindings Map of line starters to corresponding parsing lambdas (lvalue).
             * @throws std::runtime_error If file cannot be opened.
             */
-            lambda_parser( const std::filesystem::path &path, const std::unordered_map< std::string, Parser > &bindings );
+            lambda_parser_t( const std::filesystem::path &path, const std::unordered_map< std::string, Parser > &bindings );
             /**
             * @brief Constructor.
             * @param[in] path Path to the input file.
             * @param[in] bindings Map of line starters to corresponding parsing lambdas (rvalue).
             * @throws std::runtime_error If file cannot be opened.
             */
-            lambda_parser( const std::filesystem::path &path, std::unordered_map< std::string, Parser > &&bindings );
+            lambda_parser_t( const std::filesystem::path &path, std::unordered_map< std::string, Parser > &&bindings );
             /**
             * @brief Overridden parse method.
             * @details Calls the respective lambda parser for each input line.

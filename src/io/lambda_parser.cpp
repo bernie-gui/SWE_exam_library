@@ -1,5 +1,5 @@
 /*
- * File: common.hpp
+ * File: lambda_parser.cpp
  * Copyright (c) 2025 bernie_gui, uniquadev, SepeFr.
  *
  * This file is part of SWE_exam_library
@@ -22,18 +22,18 @@
  * Academic Year: 2025-2026
  *
  * Description:
- *	This header file defines common types and utilities used throughout the simulation library.
+ *	This file implements the lambda_parser_t class methods for parsing input files.
  */
 #include "io/lambda_parser.hpp"
 using namespace isw;
 
-lambda_parser::lambda_parser( const std::filesystem::path &path, const std::unordered_map< std::string, Parser > &bindings ):
+lambda_parser_t::lambda_parser_t( const std::filesystem::path &path, const std::unordered_map< std::string, Parser > &bindings ):
     input_parser_t( path ), _bindings( bindings ) {}
 
-lambda_parser::lambda_parser( const std::filesystem::path &path, std::unordered_map< std::string, Parser > &&bindings ):
+lambda_parser_t::lambda_parser_t( const std::filesystem::path &path, std::unordered_map< std::string, Parser > &&bindings ):
     input_parser_t( path ), _bindings( std::move( bindings ) ) {}
 
-void lambda_parser::parse() {
+void lambda_parser_t::parse() {
     std::string line;
     std::istringstream iss;
     std::string key;

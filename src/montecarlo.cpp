@@ -26,7 +26,6 @@
  */
 #include "montecarlo.hpp"
 #include "simulator.hpp"
-// #include "system.hpp"
 using namespace isw;
 
 montecarlo_t::montecarlo_t( std::shared_ptr< simulator_t > sim ) : _sim( sim ) {}

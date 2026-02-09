@@ -1,5 +1,5 @@
 /*
- * File: common.hpp
+ * File: backtracking.hpp
  * Copyright (c) 2025 bernie_gui, uniquadev, SepeFr.
  *
  * This file is part of SWE_exam_library
@@ -22,7 +22,7 @@
  * Academic Year: 2025-2026
  *
  * Description:
- *	This header file defines common types and utilities used throughout the simulation library.
+ *	This header file defines backtracking-related utilities.
  */
 #pragma once
 

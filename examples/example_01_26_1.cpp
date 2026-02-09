@@ -128,7 +128,7 @@ int main()
     auto gl = std::make_shared< uav_global >();
     auto sys = system_t::create( gl); //why create???
     size_t N;
-    auto reader = lambda_parser("examples/example_01_26_1.txt", {
+    auto reader = lambda_parser_t("examples/example_01_26_1.txt", {
         {"A", [gl](auto& iss) { iss >> gl->A; }},
         {"L", [gl](auto& iss) { iss >> gl->L; }},
         {"V", [gl](auto& iss) { iss >> gl->V; }},
