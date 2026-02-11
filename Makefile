@@ -114,4 +114,5 @@ use:
 examples: $(EX_BINS)
 
 clean:
-	rm -rf $(BUILD_DIR) $(TARGET) $(EX_BINS)
+	-rm -rf $(TARGET) $(EX_BINS)
+	-@rm -rf $(BUILD_DIR)/* $(BUILD_DIR)/.[!.]* $(BUILD_DIR)/..?* 2>/dev/null || true
