@@ -25,6 +25,7 @@
  *	This header file defines the logger_t class for logging simulation data to CSV files.
  */
 #pragma once
+
 #include <filesystem>
 #include <fstream>
 #include <memory>

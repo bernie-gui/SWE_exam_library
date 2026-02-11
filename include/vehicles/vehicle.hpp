@@ -24,6 +24,8 @@
  * Description:
  *	This header file defines the vehicle_t class for unmanned vehicles simulations.
  */
+#pragma once
+
 #include <cstddef>
 #include <memory>
 #include <vector>
@@ -67,9 +69,4 @@ namespace isw::uv {
         private:
             act _policy;
     };
-
-    size_t count_collisions(const std::vector<std::shared_ptr<vehicle_t>> &vehicles, 
-        double coll_radius, size_t dimensions);
-
-    double euclidean_distance(std::shared_ptr<vehicle_t> v1, std::shared_ptr<vehicle_t> v2, size_t dimensions);
 }

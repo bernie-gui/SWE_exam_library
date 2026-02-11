@@ -15,6 +15,7 @@
 #include "utils/backtracking.hpp"
 #include "utils/rate.hpp"
 #include "vehicles/vehicle.hpp"
+#include "vehicles/functions.hpp"
 using namespace isw;
 
 class uav_global : public global_t

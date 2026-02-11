@@ -22,7 +22,7 @@
  * Academic Year: 2025-2026
  *
  * Description:
- *	This header file implements the vehicle_t class for unmanned vehicles simulations.
+ *	This file implements the vehicle_t class for unmanned vehicles simulations.
  */
 #include "vehicles/vehicle.hpp"
 #include <cstddef>
@@ -64,35 +64,4 @@ uv_thread_t::uv_thread_t(double c_time, act policy, double th_time) :
 
 void uv_thread_t::fun() {
     _policy(get_process< vehicle_t >());
-}
-
-size_t isw::uv::count_collisions(const std::vector<std::shared_ptr<vehicle_t>> &vehicles, 
-    double coll_radius, size_t dimensions) {
-        std::vector< std::vector< bool > > collisions;
-        size_t id1, id2, collision_count = 0;
-        double dist = 0;
-        collisions.resize( vehicles.size() );
-        for ( auto &row : collisions )
-            row.resize( vehicles.size() );
-        for ( auto v1 : vehicles )
-            for ( auto v2 : vehicles ) {
-                id1 = v1->get_relative_id().value();
-                id2 = v2->get_relative_id().value();
-                if ( collisions[id2][id1] || id1 == id2 ) continue;
-                dist = euclidean_distance(v1, v2, dimensions);
-                if ( dist > coll_radius ) continue;
-                collisions[id1][id2] = true;
-                collision_count++;
-            }
-        return collision_count;
-    }
-
-double isw::uv::euclidean_distance(std::shared_ptr<vehicle_t> v1, std::shared_ptr<vehicle_t> v2, size_t dimensions) {
-    double temp, dist = 0;
-    for ( size_t i = 0; i < dimensions; i++ ) {
-        temp =  v1->pos[i] - v2->pos[i];
-        dist += temp * temp;
-    }
-    dist = std::sqrt( dist );
-    return dist;
 }
