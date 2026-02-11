@@ -178,7 +178,7 @@ int main()
     for (i = 0; i < gl->C; i++) {
         sys->add_process( std::make_shared< cust >()->add_thread( std::make_shared< cust_thread_1 >() )->add_thread(std::make_shared<cust_thread_2>()), "Customers" );
     }
-    sys->add_network();
+    sys->add_pid_network();
 
     auto sim = std::make_shared< sim_help >( sys );
 

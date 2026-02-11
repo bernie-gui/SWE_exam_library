@@ -37,7 +37,6 @@ namespace isw
     constexpr double KI = 0.05;
     constexpr double KD = 0.01;
     constexpr double DV_ALPHA = 0.2;
-    constexpr double ERROR_THRESHOLD = 0.1;
 
     /**
      * @brief Thread responsible for scanning processes and dispatching messages between them.
@@ -51,7 +50,7 @@ namespace isw
          * @brief Constructs a pid-scanner thread with specified timing parameters.
          * @param[in] th_time Thread time, defaults to 0.0.
          */
-        pid_scanner_t( double obj_occupancy = 1, double th_time = 0.0 );
+        pid_scanner_t( double obj_occupancy = 1, double th_time = 0.0, double error_threshold = 0 );
         virtual void on_start_scan() override;
         /**
          * @brief Initializes the scanner with the current list of processes.
@@ -61,6 +60,7 @@ namespace isw
 
     protected:
         double _obj_occupancy, _integral, 
-            _prev_error, _prev_dv, _last_time;
+            _prev_error, _prev_dv, _last_time,
+            _error_threshold;
     };
 }

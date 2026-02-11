@@ -71,9 +71,9 @@ std::shared_ptr< system_t > system_t::add_network( std::shared_ptr< network_t > 
     return shared_from_this();
 }
 
-std::shared_ptr< system_t > system_t::add_pid_network( double obj_occupancy, double th_time ) {
+std::shared_ptr< system_t > system_t::add_pid_network( double obj_occupancy, double th_time, double error_threshold ) {
     auto net = std::make_shared< network_t >();
-    net->add_thread( std::make_shared< pid_scanner_t >( obj_occupancy, th_time ) );
+    net->add_thread( std::make_shared< pid_scanner_t >( obj_occupancy, th_time, error_threshold ) );
     return add_network(net);
 }
 

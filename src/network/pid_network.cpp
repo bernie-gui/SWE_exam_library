@@ -28,8 +28,9 @@
 #include <algorithm>
 using namespace isw;
 
-pid_scanner_t::pid_scanner_t(double obj_occupancy, double th_time) : scanner_t(0.2, S_TIME_MIN, th_time), 
-    _obj_occupancy(obj_occupancy), _integral(0), _prev_error(0), _prev_dv(0), _last_time(0) {}
+pid_scanner_t::pid_scanner_t(double obj_occupancy, double th_time, double error_threshold) : 
+    scanner_t(0.2, S_TIME_MIN, th_time), _obj_occupancy(obj_occupancy), _integral(0), 
+    _prev_error(0), _prev_dv(0), _last_time(0), _error_threshold(error_threshold) {}
 
 void pid_scanner_t::on_start_scan() {
     if (get_thread_time() == 0) return;
@@ -43,7 +44,7 @@ void pid_scanner_t::on_start_scan() {
     double dv = (error - _prev_error) / dt; //update last time
     double smooth_dv = (1 - DV_ALPHA) * _prev_dv + DV_ALPHA * dv;
     double control_1 = KP * error + KD * smooth_dv;
-    if (std::abs(error) < ERROR_THRESHOLD) _integral = 0.0;
+    if (std::abs(error) < _error_threshold) _integral = 0.0;
     else {
         double try_integral = _integral + error * dt;
         double try_control = control_1 + try_integral * KI;
