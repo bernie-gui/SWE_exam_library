@@ -22,12 +22,13 @@
  * Academic Year: 2025-2026
  *
  * Description:
- *	This header file defines the request_t class and for customer-server message passing in the simulation.
+ *	This header file defines the request_t class for customer-server message passing in the simulation.
  */
 #pragma once
 #include <cstddef>
 #include "network/message.hpp"
 
+//TODO: documentation
 namespace isw::cs {
     class request_t : public network::message_t {
         public:

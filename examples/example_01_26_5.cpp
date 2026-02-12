@@ -16,8 +16,10 @@
 #include "simulator.hpp"
 #include "system.hpp"
 #include "utils/rate.hpp"
-#include "customer-server/request.hpp"
+#include "customer-server/utils.hpp"
 #include "customer-server/server.hpp"
+#include "customer-server/supplier.hpp"
+
 using namespace isw;
 
 class requests_global : public global_t {
@@ -82,25 +84,6 @@ class cust_thread_2 : public thread_t {
         cust_thread_2() : thread_t(1, 0, 1) {}
 };
 
-class supplier_thread : public thread_t {
-    public:
-        void fun() override {
-            auto gl = get_global<requests_global>();
-            size_t server;
-            cs::request_t msg;
-            msg.item = gl->get_random()->uniform_range(0, gl->P-1);
-            msg.quantity = gl->get_random()->uniform_range(1, gl->Q);
-            server = gl->get_random()->uniform_range(0, gl->S-1);
-            send_message("Servers", server, msg);
-            set_compute_time(gl->get_random()->uniform_range(gl->V, gl->W));
-        }
-        void init() override {
-            thread_t::init();
-            auto gl = get_global<requests_global>();
-            set_compute_time(gl->get_random()->uniform_range(gl->V, gl->W));
-        }
-};
-
 class sim_help : public simulator_t {
     public:
         void on_terminate() override {
@@ -141,7 +124,13 @@ class my_opt : public optimizer_t<double> {
                 ), "Servers" );
             }
             for (i = 0; i < gl->F; i++) {
-                sys->add_process( std::make_shared< process_t >()->add_thread( std::make_shared< supplier_thread >() ), "Suppliers" );
+                sys->add_process( cs::supplier_t::create_process(
+                gl->get_random()->uniform_range(gl->V, gl->W), 
+                [gl]() {return gl->get_random()->uniform_range(0, gl->S-1);}, 
+                [gl](auto){return gl->get_random()->uniform_range(0, gl->P-1);}, 
+                [gl](auto){return gl->get_random()->uniform_range(1, gl->Q);},
+                "Servers",
+                [gl](){return gl->get_random()->uniform_range(gl->V, gl->W);}), "Suppliers" );
             }
             for (i = 0; i < gl->C; i++) {
                 sys->add_process( std::make_shared< cust >()->add_thread( std::make_shared< cust_thread_1 >() )->add_thread(std::make_shared<cust_thread_2>()), "Customers" );

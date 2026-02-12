@@ -22,7 +22,7 @@
  * Academic Year: 2025-2026
  *
  * Description:
- *	This header file defines the server_t type for custormer-server simulations.
+ *	This header file defines the server_t and server_thread_t classes for custormer-server simulations.
  */
 #pragma once
 
