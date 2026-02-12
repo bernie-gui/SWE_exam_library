@@ -32,7 +32,7 @@
 
 namespace isw {
 
-    using Parser = std::function<void(std::istringstream&)>;
+    using parser = std::function<void(std::istringstream&)>;
 
     /**
      * @brief Input parser implementation using lambdas.
@@ -46,14 +46,14 @@ namespace isw {
             * @param[in] bindings Map of line starters to corresponding parsing lambdas (lvalue).
             * @throws std::runtime_error If file cannot be opened.
             */
-            lambda_parser_t( const std::filesystem::path &path, const std::unordered_map< std::string, Parser > &bindings );
+            lambda_parser_t( const std::filesystem::path &path, const std::unordered_map< std::string, parser > &bindings );
             /**
             * @brief Constructor.
             * @param[in] path Path to the input file.
             * @param[in] bindings Map of line starters to corresponding parsing lambdas (rvalue).
             * @throws std::runtime_error If file cannot be opened.
             */
-            lambda_parser_t( const std::filesystem::path &path, std::unordered_map< std::string, Parser > &&bindings );
+            lambda_parser_t( const std::filesystem::path &path, std::unordered_map< std::string, parser > &&bindings );
             /**
             * @brief Overridden parse method.
             * @details Calls the respective lambda parser for each input line.
@@ -61,6 +61,6 @@ namespace isw {
             void parse() override;
         private:
             /** @brief Lambda bindings map. */    
-            std::unordered_map< std::string, Parser > _bindings;
+            std::unordered_map< std::string, parser > _bindings;
     };
 }

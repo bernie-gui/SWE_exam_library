@@ -32,5 +32,7 @@ using namespace isw::cs;
 server_t::server_t(size_t db_size, fill init, std::string name) : process_t(name), database(db_size), _init(init) {}
 
 void server_t::init() {
-    
+    process_t::init();
+    for (size_t i = 0; i < database.size(); i++)
+        database[i] = _init(i);
 }

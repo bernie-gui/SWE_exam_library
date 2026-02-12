@@ -6,11 +6,11 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <algorithm>
-#include <vector>
+#include "customer-server/request.hpp"
+#include "customer-server/server.hpp"
 #include "global.hpp"
 #include "io/lambda_parser.hpp"
 #include "montecarlo.hpp"
-#include "network/message.hpp"
 #include "process.hpp"
 #include "simulator.hpp"
 #include "system.hpp"
@@ -28,49 +28,6 @@ class requests_global : public global_t {
         }
 };
 
-class sys_msg : public network::message_t {
-    public:
-        size_t item, quant;
-};
-
-class server : public process_t {
-    public:
-        std::vector<size_t> DB;
-        void init() override {
-            process_t::init();
-            auto gl = get_global<requests_global>();
-            DB.clear();
-            for (size_t i = 0; i < gl->P; i++) 
-                DB.emplace_back(gl->get_random()->uniform_range(0, gl->Q));
-        }
-};
-
-class server_thread : public thread_t {
-    public:
-        void fun() override {
-            std::shared_ptr< sys_msg > msg;
-            sys_msg ret;
-            size_t copy;
-            auto p = get_process< server >();
-            auto gl = get_global< requests_global >();
-            if ((msg = receive_message< sys_msg >()) == nullptr) return;
-            if (msg->world_key == "Customers") {
-                copy = std::min(p->DB[msg->item], msg->quant);
-                if (copy < msg->quant) gl->measure.update(1, get_thread_time());
-                p->DB[msg->item] -= copy;
-                ret.quant = copy;
-                ret.item = msg->item;
-                send_message(msg->sender, ret);
-            }
-            else if (msg->world_key == "Suppliers") {
-                p->DB[msg->item]+=msg->quant;
-            }
-            else throw std::runtime_error(" unknown sender type ");
-        }
-
-        server_thread() : thread_t(0.1, 0.2) {} // da rivedere sta cosa
-};
-
 class cust : public process_t {
     public:
         std::unordered_multimap<std::pair<size_t, size_t>, size_t> request_history;
@@ -84,13 +41,13 @@ class cust_thread_1 : public thread_t {
     public:
         void fun() override {
             size_t server;
-            sys_msg msg;
+            cs::request_t msg;
             auto gl = get_global< requests_global >();
             auto p = get_process< cust >();
             msg.item = gl->get_random()->uniform_range(0, gl->P-1);
-            msg.quant = gl->get_random()->uniform_range(1, gl->Q);
+            msg.quantity = gl->get_random()->uniform_range(1, gl->Q);
             server = gl->get_random()->uniform_range(0, gl->S-1);
-            p->request_history.emplace(std::make_pair(server, msg.item), msg.quant);
+            p->request_history.emplace(std::make_pair(server, msg.item), msg.quantity);
             send_message("Servers", server, msg);
             set_compute_time(gl->get_random()->uniform_range(gl->A, gl->B));
         }
@@ -104,11 +61,11 @@ class cust_thread_1 : public thread_t {
 class cust_thread_2 : public thread_t {
     public:
         void fun() override {
-            std::shared_ptr<sys_msg> msg;
+            std::shared_ptr<cs::request_t> msg;
             auto p = get_process<cust>();
             auto gl = get_global<requests_global>();
             // size_t quant;
-            if ((msg = receive_message<sys_msg>()) == nullptr) return;
+            if ((msg = receive_message<cs::request_t>()) == nullptr) return;
             // quant = msg->quant;
             auto i = p->request_history.find({msg->sender_rel, msg->item});
             if (i != p->request_history.end()) {
@@ -127,9 +84,9 @@ class supplier_thread : public thread_t {
         void fun() override {
             auto gl = get_global<requests_global>();
             size_t server;
-            sys_msg msg;
+            cs::request_t msg;
             msg.item = gl->get_random()->uniform_range(0, gl->P-1);
-            msg.quant = gl->get_random()->uniform_range(1, gl->Q);
+            msg.quantity = gl->get_random()->uniform_range(1, gl->Q);
             server = gl->get_random()->uniform_range(0, gl->S-1);
             send_message("Servers", server, msg);
             set_compute_time(gl->get_random()->uniform_range(gl->V, gl->W));
@@ -170,7 +127,25 @@ int main()
     size_t i;
     reader.parse();
     for (i = 0; i < gl->S; i++ ) {
-        sys->add_process( std::make_shared< server >()->add_thread( std::make_shared< server_thread >() ), "Servers" );
+        sys->add_process( cs::server_t::create_process< cs::request_t >(
+            gl->P,
+            [gl](auto){return gl->get_random()->uniform_range(0, gl->Q);},
+            0.1,
+            {{"Customers", [gl](auto pt, auto msg){
+                auto p = pt->template get_process<cs::server_t>();
+                auto copy = std::min(p->database[msg->item], msg->quantity);
+                cs::request_t ret;
+                if (copy < msg->quantity) gl->measure.update(1, pt->get_thread_time());
+                p->database[msg->item] -= copy;
+                ret.quantity = copy;
+                ret.item = msg->item;
+                pt->send_message(msg->sender, ret);
+            }},
+            {"Suppliers", [](auto p, auto msg){
+                auto pt = p->template get_process<cs::server_t>();
+                pt->database[msg->item]+=msg->quantity;
+            }}}
+        ), "Servers" );
     }
     for (i = 0; i < gl->F; i++) {
         sys->add_process( std::make_shared< process_t >()->add_thread( std::make_shared< supplier_thread >() ), "Suppliers" );
@@ -178,7 +153,7 @@ int main()
     for (i = 0; i < gl->C; i++) {
         sys->add_process( std::make_shared< cust >()->add_thread( std::make_shared< cust_thread_1 >() )->add_thread(std::make_shared<cust_thread_2>()), "Customers" );
     }
-    sys->add_pid_network();
+    sys->add_network();
 
     auto sim = std::make_shared< sim_help >( sys );
 

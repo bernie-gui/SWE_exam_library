@@ -1,5 +1,5 @@
 /*
- * File: optimizer.cpp
+ * File: request.hpp
  * Copyright (c) 2025 bernie_gui, uniquadev, SepeFr.
  *
  * This file is part of SWE_exam_library
@@ -22,7 +22,15 @@
  * Academic Year: 2025-2026
  *
  * Description:
- *	This file implements the optimizer_t class methods for optimization using Monte Carlo methods.
+ *	This header file defines the request_t class and for customer-server message passing in the simulation.
  */
+#pragma once
+#include <cstddef>
+#include "network/message.hpp"
 
-// VOID FILE, EVERYTHING DEFINED IN HEADER
+namespace isw::cs {
+    class request_t : public network::message_t {
+        public:
+            size_t item, quantity;
+    };
+}

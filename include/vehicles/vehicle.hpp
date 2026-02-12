@@ -35,8 +35,8 @@
 //TODO: add documentation
 namespace isw::uv {
 
-    class vehicle_t;
-    using act = std::function<void(std::shared_ptr< vehicle_t >)>;
+    class uv_thread_t;
+    using act = std::function<void(std::shared_ptr< uv_thread_t >)>;
     using fill = std::function<double(size_t)>;
 
     class vehicle_t : public process_t {
@@ -60,7 +60,7 @@ namespace isw::uv {
             fill _init_pos, _init_vel;
     };
 
-    class uv_thread_t : public thread_t {
+    class uv_thread_t : public thread_t, public std::enable_shared_from_this<uv_thread_t> {
         public:
             uv_thread_t(double c_time, act policy, double th_time = 0);
 

@@ -63,5 +63,5 @@ uv_thread_t::uv_thread_t(double c_time, act policy, double th_time) :
     thread_t(c_time, 0, th_time), _policy(policy) {}
 
 void uv_thread_t::fun() {
-    _policy(get_process< vehicle_t >());
+    _policy(shared_from_this());
 }

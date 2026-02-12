@@ -27,10 +27,10 @@
 #include "io/lambda_parser.hpp"
 using namespace isw;
 
-lambda_parser_t::lambda_parser_t( const std::filesystem::path &path, const std::unordered_map< std::string, Parser > &bindings ):
+lambda_parser_t::lambda_parser_t( const std::filesystem::path &path, const std::unordered_map< std::string, parser > &bindings ):
     input_parser_t( path ), _bindings( bindings ) {}
 
-lambda_parser_t::lambda_parser_t( const std::filesystem::path &path, std::unordered_map< std::string, Parser > &&bindings ):
+lambda_parser_t::lambda_parser_t( const std::filesystem::path &path, std::unordered_map< std::string, parser > &&bindings ):
     input_parser_t( path ), _bindings( std::move( bindings ) ) {}
 
 void lambda_parser_t::parse() {

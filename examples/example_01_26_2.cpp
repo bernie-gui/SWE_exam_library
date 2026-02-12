@@ -71,7 +71,8 @@ int main()
         sys->add_process( uv::vehicle_t::create_process(3, gl->T, 
             [gl](auto){return gl->get_random()->uniform_range( static_cast< double >( -gl->L ), static_cast< double >( gl->L )); }, 
             [](auto){return 0;}, 
-            [gl](auto pt){
+            [gl](auto p){
+                auto pt = p->template get_process< uv::vehicle_t >();
                 for ( int i = 0; i < 3; i++ ) pt->pos[i] += pt->vel[i] * gl->T;
                 std::unordered_set<double> x = { gl->V, -gl->V };
                 std::function<double(std::shared_ptr<std::vector<double>>)> f = [gl, pt](auto v) {
