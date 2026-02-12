@@ -53,9 +53,9 @@ void supplier_thread_t::fun() {
     send.item = item;
     send.quantity = quant;
     send_message(_servers, choice, send);
-    if (_compute != 0)
+    if (_compute)
         set_compute_time(_compute());
-    if (_sleep != 0)
+    if (_sleep)
         set_sleep_time(_sleep());
 }
         
