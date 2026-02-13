@@ -52,3 +52,11 @@ void lambda_parser_t::parse() {
         }
     }
 }
+
+void lambda_parser_t::set_bindings(std::unordered_map< std::string, parser > &&bindings) {
+   _bindings = std::move(bindings);
+}
+
+void lambda_parser_t::set_bindings(const std::unordered_map< std::string, parser > &bindings) {
+    _bindings = bindings;
+}

@@ -120,14 +120,13 @@ class my_opt : public optimizer_t<double> {
                         auto pt = p->template get_process<cs::server_t>();
                         pt->database[msg->item]+=msg->quantity;
                     }}},
-                    0.2
-                ), "Servers" );
+                    0.2), "Servers" );
             }
             for (i = 0; i < gl->F; i++) {
                 sys->add_process( cs::supplier_t::create_process(
-                gl->get_random()->uniform_range(gl->V, gl->W), 
-                [gl]() {return gl->get_random()->uniform_range(0, gl->S-1);}, 
-                [gl](auto){return gl->get_random()->uniform_range(0, gl->P-1);}, 
+                gl->get_random()->uniform_range(gl->V, gl->W),
+                [gl]() {return gl->get_random()->uniform_range(0, gl->S-1);},
+                [gl](auto){return gl->get_random()->uniform_range(0, gl->P-1);},
                 [gl](auto){return gl->get_random()->uniform_range(1, gl->Q);},
                 "Servers",
                 [gl](){return gl->get_random()->uniform_range(gl->V, gl->W);}), "Suppliers" );

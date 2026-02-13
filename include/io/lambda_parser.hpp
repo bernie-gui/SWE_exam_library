@@ -59,6 +59,9 @@ namespace isw {
             * @details Calls the respective lambda parser for each input line.
             */
             void parse() override;
+            //TODO: documentation
+            void set_bindings(std::unordered_map< std::string, parser > &&bindings);
+            void set_bindings(const std::unordered_map< std::string, parser > &bindings);
         private:
             /** @brief Lambda bindings map. */    
             std::unordered_map< std::string, parser > _bindings;
