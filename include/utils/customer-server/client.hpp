@@ -1,5 +1,5 @@
 /*
- * File: functions.hpp
+ * File: server.hpp
  * Copyright (c) 2025 bernie_gui, uniquadev, SepeFr.
  *
  * This file is part of SWE_exam_library
@@ -22,17 +22,10 @@
  * Academic Year: 2025-2026
  *
  * Description:
- *	This header file defines vehicle-related utilities.
+ *	This header file defines the server_t and server_thread_t classes for custormer-server simulations.
  */
 #pragma once
 
-#include <cstddef>
-#include "vehicles/vehicle.hpp"
+namespace isw::cs {
 
-//TODO: documentation
-namespace isw::uv {
-    size_t count_collisions(const std::vector<std::shared_ptr<vehicle_t>> &vehicles, 
-        double coll_radius, size_t dimensions);
-
-    double euclidean_distance(std::shared_ptr<vehicle_t> v1, std::shared_ptr<vehicle_t> v2, size_t dimensions);
 }

@@ -26,8 +26,8 @@
  */
 #include <memory>
 #include "process.hpp"
-#include "customer-server/supplier.hpp"
-#include "customer-server/utils.hpp"
+#include "utils/customer-server/supplier.hpp"
+#include "utils/customer-server/utils.hpp"
 
 using namespace isw::cs;
 

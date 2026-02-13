@@ -16,9 +16,9 @@
 #include "simulator.hpp"
 #include "system.hpp"
 #include "utils/rate.hpp"
-#include "customer-server/utils.hpp"
-#include "customer-server/server.hpp"
-#include "customer-server/supplier.hpp"
+#include "utils/customer-server/utils.hpp"
+#include "utils/customer-server/server.hpp"
+#include "utils/customer-server/supplier.hpp"
 using namespace isw;
 
 class requests_global : public global_t {

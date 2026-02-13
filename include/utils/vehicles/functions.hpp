@@ -1,5 +1,5 @@
 /*
- * File: server.cpp
+ * File: functions.hpp
  * Copyright (c) 2025 bernie_gui, uniquadev, SepeFr.
  *
  * This file is part of SWE_exam_library
@@ -22,17 +22,17 @@
  * Academic Year: 2025-2026
  *
  * Description:
- *	This file implements the server_t type for custormer-server simulations.
+ *	This header file defines vehicle-related utilities.
  */
-#include "utils/customer-server/server.hpp"
-#include "process.hpp"
+#pragma once
 
-using namespace isw::cs;
+#include <cstddef>
+#include "utils/vehicles/vehicle.hpp"
 
-server_t::server_t(size_t db_size, fill init, std::string name) : process_t(name), database(db_size), _init(init) {}
+//TODO: documentation
+namespace isw::uv {
+    size_t count_collisions(const std::vector<std::shared_ptr<vehicle_t>> &vehicles, 
+        double coll_radius, size_t dimensions);
 
-void server_t::init() {
-    process_t::init();
-    for (size_t i = 0; i < database.size(); i++)
-        database[i] = _init(i);
+    double euclidean_distance(std::shared_ptr<vehicle_t> v1, std::shared_ptr<vehicle_t> v2, size_t dimensions);
 }

@@ -24,7 +24,7 @@
  * Description:
  *	This file implements vehicle utility functions.
  */
-#include "vehicles/functions.hpp"
+#include "utils/vehicles/functions.hpp"
 
 size_t isw::uv::count_collisions(const std::vector<std::shared_ptr<vehicle_t>> &vehicles, 
     double coll_radius, size_t dimensions) {

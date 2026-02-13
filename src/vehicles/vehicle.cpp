@@ -24,7 +24,7 @@
  * Description:
  *	This file implements the vehicle_t class for unmanned vehicles simulations.
  */
-#include "vehicles/vehicle.hpp"
+#include "utils/vehicles/vehicle.hpp"
 #include <cstddef>
 #include <memory>
 #include <vector>

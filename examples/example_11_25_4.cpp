@@ -7,8 +7,8 @@
 #include <tuple>
 #include <unordered_map>
 #include <algorithm>
-#include "customer-server/utils.hpp"
-#include "customer-server/server.hpp"
+#include "utils/customer-server/utils.hpp"
+#include "utils/customer-server/server.hpp"
 #include "global.hpp"
 #include "io/lambda_parser.hpp"
 #include "montecarlo.hpp"
