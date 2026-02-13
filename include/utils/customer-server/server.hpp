@@ -58,8 +58,8 @@ namespace isw::cs {
 
             template <class mes_type>
             static std::shared_ptr<server_t> create_process(size_t db_size, fill init, 
-                double c_time, binding<mes_type> &bindings, double s_time = 0, double th_time = 0, 
-                set compute = 0, set sleep = 0, std::string name = "default server") {
+                double c_time, binding<mes_type> &bindings, set compute = 0, set sleep = 0, 
+                double s_time = 0, double th_time = 0, std::string name = "default server") {
                     auto res = std::make_shared<server_t>(db_size, init, name);
                     res->add_thread(std::make_shared<server_thread_t<mes_type>>(c_time, bindings, compute, 
                                 sleep, s_time, th_time));
@@ -68,8 +68,8 @@ namespace isw::cs {
             
             template <class mes_type>
             static std::shared_ptr<server_t> create_process(size_t db_size, fill init, 
-                double c_time, binding<mes_type> &&bindings, double s_time = 0, double th_time = 0, 
-                set compute = 0, set sleep = 0, std::string name = "default server") {
+                double c_time, binding<mes_type> &&bindings, set compute = 0, set sleep = 0,
+                double s_time = 0, double th_time = 0, std::string name = "default server") {
                     auto res = std::make_shared<server_t>(db_size, init, name);
                     res->add_thread(std::make_shared<server_thread_t<mes_type>>(c_time, std::move(bindings), 
                         compute, sleep, s_time, th_time));

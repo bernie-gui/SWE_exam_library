@@ -42,10 +42,9 @@ namespace isw::cs {
         public:
             supplier_t(std::string name = "default server");
 
-            static std::shared_ptr<supplier_t> create_process(double c_time, pick policy, ask item, ask quantity, 
-                world_key_t servers, set compute = 0, set sleep = 0, 
-                double s_time = 0, double th_time = 0, 
-                std::string name = "default server");
+            static std::shared_ptr<supplier_t> create_process(double c_time, pick policy, 
+                ask item, ask quantity, world_key_t servers, set compute = 0, set sleep = 0, 
+                double s_time = 0, double th_time = 0, std::string name = "default server");
     };
 
     class supplier_thread_t : public thread_t {

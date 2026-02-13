@@ -124,6 +124,7 @@ class my_opt : public optimizer_t<int> {
                             auto pt = p->template get_process<cs::server_t>();
                             pt->database[msg->item]+=msg->quantity;
                     }}},
+                    0, 0,
                     0.2
                 ), "Servers" );
             }
