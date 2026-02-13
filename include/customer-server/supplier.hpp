@@ -31,14 +31,13 @@
 #include <memory>
 #include "common.hpp"
 #include "process.hpp"
+#include "customer-server/utils.hpp"
 
 //TODO: documentation
 namespace isw::cs {
     class supplier_thread_t;
     using pick = std::function<size_t(void)>;
     using ask = std::function<size_t(size_t)>;
-    using set = std::function<double(void)>;
-
     class supplier_t : public process_t {
         public:
             supplier_t(std::string name = "default server");

@@ -29,6 +29,7 @@
 #include <cstddef>
 #include <functional>
 #include <vector>
+#include <tuple>
 
 // TODO: documentation (?)
 template<typename T, typename R>
@@ -47,6 +48,17 @@ struct std::hash<std::vector<T>> {
           size_t ret = 7;     
           for (const auto &e : p)     
                ret = (ret + std::hash<T>()(e)) * 31;
+          return ret;
+    }
+};
+
+template<typename T, typename R, typename Z>
+struct std::hash<std::tuple<T, R, Z>> {
+     size_t operator()(const std::tuple<T, R, Z>& t) const noexcept {
+          size_t ret = 7;
+          ret = (ret + std::hash<T>()(std::get<0>(t))) * 31;
+          ret = (ret + std::hash<R>()(std::get<1>(t))) * 31;
+          ret = (ret + std::hash<Z>()(std::get<2>(t))) * 31;
           return ret;
     }
 };

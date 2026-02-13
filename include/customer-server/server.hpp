@@ -36,6 +36,7 @@
 #include <stdexcept>
 #include "common.hpp"
 #include "process.hpp"
+#include "customer-server/utils.hpp"
 
 //TODO: documentation
 namespace isw::cs {
@@ -57,17 +58,21 @@ namespace isw::cs {
 
             template <class mes_type>
             static std::shared_ptr<server_t> create_process(size_t db_size, fill init, 
-                double c_time, binding<mes_type> &bindings, double s_time = 0, double th_time = 0, std::string name = "default server") {
+                double c_time, binding<mes_type> &bindings, double s_time = 0, double th_time = 0, 
+                set compute = 0, set sleep = 0, std::string name = "default server") {
                     auto res = std::make_shared<server_t>(db_size, init, name);
-                    res->add_thread(std::make_shared<server_thread_t<mes_type>>(c_time, bindings, s_time, th_time));
+                    res->add_thread(std::make_shared<server_thread_t<mes_type>>(c_time, bindings, compute, 
+                                sleep, s_time, th_time));
                     return res;
                 }
             
             template <class mes_type>
             static std::shared_ptr<server_t> create_process(size_t db_size, fill init, 
-                double c_time, binding<mes_type> &&bindings, double s_time = 0, double th_time = 0, std::string name = "default server") {
+                double c_time, binding<mes_type> &&bindings, double s_time = 0, double th_time = 0, 
+                set compute = 0, set sleep = 0, std::string name = "default server") {
                     auto res = std::make_shared<server_t>(db_size, init, name);
-                    res->add_thread(std::make_shared<server_thread_t<mes_type>>(c_time, std::move(bindings), s_time, th_time));
+                    res->add_thread(std::make_shared<server_thread_t<mes_type>>(c_time, std::move(bindings), 
+                        compute, sleep, s_time, th_time));
                     return res;
                 }
 
@@ -81,11 +86,13 @@ namespace isw::cs {
     class server_thread_t : public thread_t, public std::enable_shared_from_this<server_thread_t<mes_type>> {
         public:
 
-            server_thread_t(double c_time, binding<mes_type> &bindings, double s_time = 0,
-                double th_time = 0) : thread_t(c_time, s_time, th_time), _bindings(bindings) {}
+            server_thread_t(double c_time, binding<mes_type> &bindings, set compute = 0, set sleep = 0,
+                double s_time = 0, double th_time = 0) : thread_t(c_time, s_time, th_time), _bindings(bindings), 
+                _compute(compute), _sleep(sleep) {}
             
-            server_thread_t(double c_time, binding<mes_type> &&bindings, double s_time = 0,
-                double th_time = 0) : thread_t(c_time, s_time, th_time), _bindings(std::move(bindings)) {}
+            server_thread_t(double c_time, binding<mes_type> &&bindings, set compute = 0, set sleep = 0,
+                double s_time = 0, double th_time = 0) : thread_t(c_time, s_time, th_time), _bindings(std::move(bindings)),
+                _compute(compute), _sleep(sleep) {}
 
             void fun() override {
                 std::shared_ptr< mes_type > msg;
@@ -100,10 +107,15 @@ namespace isw::cs {
                     err += msg->world_key;
                     throw std::runtime_error(err);
                 }
+                if (_compute)
+                    set_compute_time(_compute());
+                if (_sleep)
+                    set_sleep_time(_sleep());
             }
 
         private:
             binding<mes_type> _bindings;
+            set _compute, _sleep;
     };
 }
 

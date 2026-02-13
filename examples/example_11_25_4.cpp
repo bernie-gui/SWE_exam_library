@@ -4,9 +4,9 @@
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+#include <tuple>
 #include <unordered_map>
 #include <algorithm>
-#include "customer-server/supplier.hpp"
 #include "customer-server/utils.hpp"
 #include "customer-server/server.hpp"
 #include "global.hpp"
@@ -59,7 +59,7 @@ class cust_thread_1 : public thread_t {
             auto gl = get_global< requests_global >();
             set_compute_time(gl->get_random()->uniform_range(gl->A, gl->B));
         }
-
+    
     private:
         size_t _tag;
 };
@@ -80,7 +80,7 @@ class cust_thread_2 : public thread_t {
                 }
                 p->request_history.erase(i);
             }
-            else throw std::runtime_error(" unknown sender ");
+            else throw std::runtime_error(" unknown answer ");
         }
         cust_thread_2() : thread_t(1, 0, 1) {}
 };
@@ -135,16 +135,6 @@ int main()
             }}},
             0.2
         ), "Servers" );
-    }
-    for (i = 0; i < gl->F; i++) {
-        sys->add_process( cs::supplier_t::create_process(
-            gl->get_random()->uniform_range(gl->V, gl->W), 
-            [gl]() {return gl->get_random()->uniform_range(0, gl->S-1);}, 
-            [gl](auto){return gl->get_random()->uniform_range(0, gl->P-1);}, 
-            [gl](auto){return gl->get_random()->uniform_range(1, gl->Q);},
-            "Servers",
-            [gl](){return gl->get_random()->uniform_range(gl->V, gl->W);}), 
-            "Suppliers" );
     }
     for (i = 0; i < gl->C; i++) {
         sys->add_process( std::make_shared< cust >()->add_thread( std::make_shared< cust_thread_1 >() )->add_thread(std::make_shared<cust_thread_2>()), "Customers" );

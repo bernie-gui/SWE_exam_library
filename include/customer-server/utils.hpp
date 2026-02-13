@@ -30,8 +30,10 @@
 
 //TODO: documentation
 namespace isw::cs {
+    using set = std::function<double(void)>;
+
     class request_t : public network::message_t {
         public:
-            size_t item, quantity;
+            size_t item, quantity, tag;
     };
 }

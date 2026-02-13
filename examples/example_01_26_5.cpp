@@ -35,7 +35,7 @@ class requests_global : public global_t {
 
 class cust : public process_t {
     public:
-        std::unordered_multimap<std::pair<size_t, size_t>, size_t> request_history;
+        std::unordered_map<std::tuple<size_t, size_t, size_t>, size_t> request_history;
         void init() override {
             process_t::init();
             request_history.clear();
@@ -51,16 +51,20 @@ class cust_thread_1 : public thread_t {
             auto p = get_process< cust >();
             msg.item = gl->get_random()->uniform_range(0, gl->P-1);
             msg.quantity = gl->get_random()->uniform_range(1, gl->Q);
+            msg.tag = _tag++;
             server = gl->get_random()->uniform_range(0, gl->S-1);
-            p->request_history.emplace(std::make_pair(server, msg.item), msg.quantity);
+            p->request_history.emplace(std::make_tuple(server, msg.item, msg.tag), msg.quantity);
             send_message("Servers", server, msg);
             set_compute_time(gl->get_random()->uniform_range(gl->A, gl->B));
         }
         void init() override {
             thread_t::init();
+            _tag = 0;
             auto gl = get_global< requests_global >();
             set_compute_time(gl->get_random()->uniform_range(gl->A, gl->B));
         }
+    private:
+        size_t _tag;
 };
 
 class cust_thread_2 : public thread_t {
@@ -69,14 +73,14 @@ class cust_thread_2 : public thread_t {
             std::shared_ptr<cs::request_t> msg;
             auto p = get_process<cust>();
             auto gl = get_global<requests_global>();
-            // size_t quant;
+            size_t quant;
             if ((msg = receive_message<cs::request_t>()) == nullptr) return;
-            // quant = msg->quant;
-            auto i = p->request_history.find({msg->sender_rel, msg->item});
+            quant = msg->quantity;
+            auto i = p->request_history.find({msg->sender_rel, msg->item, msg->tag});
             if (i != p->request_history.end()) {
-                // if (quant < i->second) {
-                //     gl->measure.update(1, get_thread_time());
-                // }
+                if (quant < i->second) {
+                    gl->measure.update(1, get_thread_time());
+                }
                 p->request_history.erase(i);
             }
             else throw std::runtime_error(" unknown sender ");
@@ -110,10 +114,11 @@ class my_opt : public optimizer_t<double> {
                         auto p = pt->template get_process<cs::server_t>();
                         auto copy = std::min(p->database[msg->item], msg->quantity);
                         cs::request_t ret;
-                        if (copy < msg->quantity) gl->measure.update(1, pt->get_thread_time());
+                        // if (copy < msg->quantity) gl->measure.update(1, pt->get_thread_time());
                         p->database[msg->item] -= copy;
                         ret.quantity = copy;
                         ret.item = msg->item;
+                        ret.tag = msg->tag;
                         pt->send_message(msg->sender, ret);
                     }},
                     {"Suppliers", [](auto p, auto msg){
