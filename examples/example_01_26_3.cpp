@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <algorithm>
+#include <vector>
 #include "customer-server/supplier.hpp"
 #include "customer-server/utils.hpp"
 #include "customer-server/server.hpp"
@@ -31,7 +32,7 @@ class requests_global : public global_t {
 
 class cust : public process_t {
     public:
-        std::unordered_map<std::tuple<size_t, size_t, size_t>, size_t> request_history;
+        std::unordered_map<std::pair<size_t, size_t>, size_t> request_history;
         void init() override {
             process_t::init();
             request_history.clear();
@@ -47,21 +48,21 @@ class cust_thread_1 : public thread_t {
             auto p = get_process< cust >();
             msg.item = gl->get_random()->uniform_range(0, gl->P-1);
             msg.quantity = gl->get_random()->uniform_range(1, gl->Q);
-            msg.tag = _tag++;
             server = gl->get_random()->uniform_range(0, gl->S-1);
-            p->request_history.emplace(std::make_tuple(server, msg.item, msg.tag), msg.quantity);
+            msg.tag = _tag[server]++;
+            p->request_history.emplace(std::make_pair(server, msg.tag), msg.quantity);
             send_message("Servers", server, msg);
             set_compute_time(gl->get_random()->uniform_range(gl->A, gl->B));
         }
         void init() override {
             thread_t::init();
-            _tag = 0;
             auto gl = get_global< requests_global >();
+            _tag = std::vector<size_t>(gl->S);
             set_compute_time(gl->get_random()->uniform_range(gl->A, gl->B));
         }
 
     private:
-        size_t _tag;
+        std::vector<size_t> _tag;
 };
 
 class cust_thread_2 : public thread_t {
@@ -73,7 +74,7 @@ class cust_thread_2 : public thread_t {
             size_t quant;
             if ((msg = receive_message<cs::request_t>()) == nullptr) return;
             quant = msg->quantity;
-            auto i = p->request_history.find({msg->sender_rel, msg->item, msg->tag});
+            auto i = p->request_history.find({msg->sender_rel, msg->tag});
             if (i != p->request_history.end()) {
                 if (quant < i->second) {
                     gl->measure.update(1, get_thread_time());

@@ -45,11 +45,11 @@ void lambda_parser_t::parse() {
             auto& parser = it->second;
             parser(iss);
         }
-        else {
-            std::string err(" unknown input specified: ");
-            err += key;
-            throw std::runtime_error(err);
-        }
+        // else {
+        //     std::string err(" unknown input specified: ");
+        //     err += key;
+        //     throw std::runtime_error(err);
+        // }
     }
 }
 

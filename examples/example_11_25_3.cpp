@@ -101,15 +101,10 @@ int main() {
                 for (auto &el : gl->diagram) el.resize(temp);
             }},
         {"B", [gl](auto &iss){size_t temp; iss >> temp; gl->set_optimizer_budget(temp); }},
-        {"K", [gl](auto &iss){iss >> gl->K;}},
-        {"A", [](auto &) {}}}
+        {"K", [gl](auto &iss){iss >> gl->K;}}}
     );
     input.parse();
     input.set_bindings({
-        {"M", [](auto &){}},
-        {"N", [](auto &){}},
-        {"B", [](auto &){}},
-        {"K", [](auto &){}},
         {"A", [gl](auto &iss){
             size_t i, j;
             double cost, prob;

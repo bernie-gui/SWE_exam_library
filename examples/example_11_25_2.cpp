@@ -81,14 +81,10 @@ int main() {
                 gl->diagram.resize(temp);
                 for (auto &el : gl->diagram) el.resize(temp);
             }},
-        {"C", [gl](auto &iss){iss >> gl->c_max;}},
-        {"A", [](auto &) {}}}
+        {"C", [gl](auto &iss){iss >> gl->c_max;}}}
     );
     input.parse();
     input.set_bindings({
-        {"M", [](auto &){}},
-        {"N", [](auto &){}},
-        {"C", [gl](auto &){}},
         {"A", [gl](auto &iss){
             size_t i, j;
             double cost, prob;

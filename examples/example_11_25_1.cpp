@@ -80,13 +80,10 @@ int main() {
                 size_t temp; iss >> temp; 
                 gl->diagram.resize(temp);
                 for (auto &el : gl->diagram) el.resize(temp);
-            }},
-        {"A", [](auto &) {}}}
+            }}}
     );
     input.parse();
     input.set_bindings({
-        {"M", [](auto &){}},
-        {"N", [](auto &){}},
         {"A", [gl](auto &iss){
             size_t i, j;
             double cost, prob;
