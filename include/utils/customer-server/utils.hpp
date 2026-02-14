@@ -34,6 +34,7 @@ namespace isw::cs {
 
     class request_t : public network::message_t {
         public:
-            size_t item, quantity, tag;
+            size_t item, tag;
+            int  quantity;
     };
 }

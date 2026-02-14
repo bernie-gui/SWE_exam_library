@@ -66,7 +66,7 @@ class mkch_sim : public simulator_t {
         void on_terminate() override {
             auto mk = get_system()->get_processes<markov>()[0];
             auto gl = get_global<mkch_global>();
-            gl->set_montecarlo_current((double) mk->cost <= gl->c_max);
+            gl->set_montecarlo_current(static_cast<double>(mk->cost) <= gl->c_max);
         }
         mkch_sim(std::shared_ptr<system_t> sys) : simulator_t(sys) {}
 };

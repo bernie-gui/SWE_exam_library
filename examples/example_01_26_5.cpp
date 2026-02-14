@@ -92,6 +92,7 @@ class sim_help : public simulator_t {
     public:
         void on_terminate() override {
             auto gl = get_global<requests_global>();
+            // gl->measure.update(0, gl->get_horizon());
             gl->set_montecarlo_current(gl->measure.get_rate());
         }
         sim_help(std::shared_ptr<system_t> s) : simulator_t(s) {}
@@ -112,7 +113,7 @@ class my_opt : public optimizer_t<double> {
                     0.1,
                     {{"Customers", [gl](auto pt, auto msg){
                         auto p = pt->template get_process<cs::server_t>();
-                        auto copy = std::min(p->database[msg->item], msg->quantity);
+                        auto copy = std::min(p->database[msg->item], static_cast<size_t>(msg->quantity));
                         cs::request_t ret;
                         // if (copy < msg->quantity) gl->measure.update(1, pt->get_thread_time());
                         p->database[msg->item] -= copy;

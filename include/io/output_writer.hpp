@@ -28,9 +28,6 @@
 
 #include <filesystem>
 #include <fstream>
-#include <memory>
-#include <sstream>
-#include "global.hpp"
 
 namespace isw
 {
