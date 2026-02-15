@@ -19,11 +19,11 @@ class requests_global : public global_t {
     public:
         size_t K, N, S, C, Q;
         double A, B, W, V, T, p, F, G;
-        utils::rate_meas_t measure_v, measure_W;
+        utils::rate_meas_t measure_v, measure_w;
         void init() override {
             global_t::init();
             measure_v.init();
-            measure_W.init();
+            measure_w.init();
         }
 };
 
@@ -48,9 +48,13 @@ class cust_thread_1 : public thread_t {
             server = gl->get_random()->uniform_range(0, gl->S-1);;
             // p->request_history.emplace(std::make_tuple(server, msg.item, msg.tag), msg.quantity);
             send_message("Servers", server, msg);
-            auto msg2 = receive_message<cs::request_t>();
-            if (msg2 && msg2->quantity == -1) {
-                gl->measure_v.update(1, get_thread_time());
+            gl->measure_w.update(1);
+            std::shared_ptr<cs::request_t> msg2;
+            while ((msg2 = receive_message<cs::request_t>())) {
+                if (msg2->quantity == -1) {
+                    gl->measure_v.update(1, get_thread_time());
+                }
+                gl->measure_w.increase(1);
             }
             set_compute_time(gl->get_random()->uniform_range(gl->A, gl->B));
         }
@@ -125,7 +129,7 @@ int main()
 
     monty->run();
 
-    std::cout << "R " << gl->get_montecarlo_avg() << std::endl;
-
+    std::cout << "V " << gl->get_montecarlo_avg() << std::endl
+                << "W " << gl->get_montecarlo_avg() << std::endl;
     return 0;
 }
