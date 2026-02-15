@@ -1,5 +1,5 @@
 /*
- * File: server.hpp
+ * File: client.hpp
  * Copyright (c) 2025 bernie_gui, uniquadev, SepeFr.
  *
  * This file is part of SWE_exam_library
@@ -22,10 +22,10 @@
  * Academic Year: 2025-2026
  *
  * Description:
- *	This header file defines the server_t and server_thread_t classes for custormer-server simulations.
+ *	This header file defines the client_t class for customer-server simulations.
  */
 #pragma once
 
 namespace isw::cs {
-
+    // TODO: implement client_t
 }

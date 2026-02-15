@@ -18,7 +18,7 @@ using namespace isw;
 
 class mkch_global : public global_t {
     public:
-        markov::markov_chain diagram;
+        markov::markov_chain_t diagram;
 };
 
 class markov_p : public process_t {
@@ -70,7 +70,7 @@ int main() {
         {{"M", [gl](auto &iss){ size_t temp; iss >> temp;  gl->set_montecarlo_budget(temp); }},
         {"N", [gl](auto &iss){ 
                 size_t temp; iss >> temp; 
-                gl->diagram = markov::markov_chain(temp);
+                gl->diagram = markov::markov_chain_t(temp);
             }}}
     );
     input.parse();

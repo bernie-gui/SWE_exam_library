@@ -26,22 +26,53 @@
  */
 #pragma once
 
-// TODO: documentation
 namespace isw::utils {
 
+    /**
+     * @brief Utility class for computing running rate measurements.
+     * @details Maintains an incrementally updated rate using the formula:
+     *   rate = old_rate * (old_denom / new_denom) + amount / new_denom.
+     *   Useful for tracking throughput, arrival rates, or other per-unit metrics in simulations.
+     */
     class rate_meas_t {
         public:
+            /**
+             * @brief Default constructor.
+             * @details Initializes rate and last denominator to 0.
+             */
             rate_meas_t();
 
+            /**
+             * @brief Updates the rate with a new observation.
+             * @param[in] amount The increment to add to the numerator.
+             * @param[in] denom The new denominator value (e.g. current simulation time).
+             * @throws std::runtime_error If denom is zero.
+             */
             void update(double amount, double denom);
 
+            /**
+             * @brief Updates the rate without adding new observations.
+             * @param[in] denom The new denominator value (e.g. current simulation time).
+             * @details Equivalent to calling update(0, denom).
+             */
             void update(double denom);
 
+            /**
+             * @brief Returns the current rate value.
+             * @return The computed rate.
+             */
             double get_rate();
 
+            /**
+             * @brief Resets the rate measurement to its initial state.
+             * @details Sets both rate and last denominator to 0.
+             */
             void init();
 
         private:
-            double _rate, _last_denom;
+            /** @brief Current rate value. */
+            double _rate;
+            /** @brief Last denominator used for the update formula. */
+            double _last_denom;
     };
 }

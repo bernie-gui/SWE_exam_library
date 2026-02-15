@@ -28,13 +28,21 @@
 #include <cstddef>
 #include "network/message.hpp"
 
-//TODO: documentation
 namespace isw::cs {
+    /** @brief Function type returning a double, used for dynamic compute and sleep time setters. */
     using set = std::function<double(void)>;
 
+    /**
+     * @brief Message type for customer-server request passing.
+     * @details Extends network::message_t with fields to identify the requested item, tag, and quantity.
+     */
     class request_t : public network::message_t {
         public:
-            size_t item, tag;
+            /** @brief Index of the requested item in the server database. */
+            size_t item;
+            /** @brief Tag identifying the type of request (e.g. buy, restock). */
+            size_t tag;
+            /** @brief Quantity to buy (negative) or restock (positive). */
             int  quantity;
     };
 }

@@ -36,19 +36,44 @@
 #include <utility>
 #include <vector>
 
-// TODO: documentation
 namespace isw::utils {
 
+    /**
+     * @brief Strategy selector for optimization direction.
+     * @details Used by arg_min_max to determine whether to minimize or maximize the objective function.
+     */
     enum class arg_strat {
     MIN, MAX
     };
 
+    /**
+     * @brief Shared pointer to a set of optimal parameter vectors.
+     * @tparam param_t The type of the parameter values (must be hashable).
+     * @details Holds all parameter combinations that achieve the same optimal result.
+     */
     template<typename param_t>
     using bucket = std::shared_ptr<std::unordered_set<std::vector<param_t>>>;
 
+    /**
+     * @brief Pair of optimal parameter vectors and the corresponding optimal result.
+     * @tparam param_t The type of the parameter values.
+     * @tparam res_t The type of the objective function result.
+     */
     template<typename param_t, typename res_t>
     using couple = std::pair<bucket<param_t>, res_t>;
 
+    /**
+     * @brief Recursive backtracking over contiguous parameter ranges.
+     * @tparam param_t The type of the parameter values (must support ++, <=, ==).
+     * @tparam res_t The type of the objective function result (must support <, >, ==).
+     * @param[in] ranges Vector of [first, second] ranges for each parameter dimension.
+     * @param[in,out] ancilla Working vector holding the current parameter combination.
+     * @param[in] strategy Optimization direction (MIN or MAX).
+     * @param[in] info Current best result and its corresponding parameter vectors.
+     * @param[in] f Objective function to evaluate on each complete parameter combination.
+     * @param[in] i Current recursion depth (parameter index), defaults to 0.
+     * @return Updated couple with the optimal result and all parameter vectors achieving it.
+     */
     template<typename param_t, typename res_t>
     couple<param_t, res_t> backtrack(std::vector<std::pair<param_t, param_t>> &ranges, std::shared_ptr<std::vector<param_t>> ancilla, arg_strat strategy, 
                                                         couple<param_t, res_t> info, std::function<res_t(std::shared_ptr<std::vector<param_t>>)> f, std::size_t i = 0) {
@@ -73,7 +98,16 @@ namespace isw::utils {
         return temp;
     }
 
-    // to use only for discrete types
+    /**
+     * @brief Finds all parameter combinations that minimize or maximize an objective function over contiguous ranges.
+     * @tparam param_t The type of the parameter values (must support ++, <=, ==).
+     * @tparam res_t The type of the objective function result.
+     * @param[in] ranges Vector of [first, second] contiguous ranges for each parameter dimension.
+     * @param[in] f Objective function to evaluate on each complete parameter combination.
+     * @param[in] strategy Optimization direction (MIN or MAX).
+     * @return Bucket containing all parameter vectors that achieve the optimal result.
+     * @note Only suitable for discrete types that support increment.
+     */
     template<typename param_t, typename res_t>
     bucket<param_t> arg_min_max(std::vector<std::pair<param_t, param_t>> &ranges, 
                                 std::function<res_t(std::shared_ptr<std::vector<param_t>>)> f, arg_strat strategy) {
@@ -84,6 +118,10 @@ namespace isw::utils {
         return info.first;
     }
 
+    /**
+     * @brief Rvalue overload of arg_min_max for contiguous ranges.
+     * @details Moves the ranges into a local variable and delegates to the lvalue overload.
+     */
     template<typename param_t, typename res_t>
     bucket<param_t> arg_min_max(std::vector<std::pair<param_t, param_t>> &&ranges, 
                                                         std::function<res_t(std::shared_ptr<std::vector<param_t>>)> f, arg_strat strategy) {
@@ -91,6 +129,18 @@ namespace isw::utils {
         return arg_min_max(rang, f, strategy);
     }
 
+    /**
+     * @brief Recursive backtracking over arbitrary (non-contiguous) parameter value sets.
+     * @tparam param_t The type of the parameter values (must be hashable).
+     * @tparam res_t The type of the objective function result (must support <, >, ==).
+     * @param[in] ranges Vector of unordered sets, each containing allowed values for a parameter dimension.
+     * @param[in,out] ancilla Working vector holding the current parameter combination.
+     * @param[in] strategy Optimization direction (MIN or MAX).
+     * @param[in] info Current best result and its corresponding parameter vectors.
+     * @param[in] f Objective function to evaluate on each complete parameter combination.
+     * @param[in] i Current recursion depth (parameter index), defaults to 0.
+     * @return Updated couple with the optimal result and all parameter vectors achieving it.
+     */
     template<typename param_t, typename res_t>
     couple<param_t, res_t> free_backtrack(std::vector<std::unordered_set<param_t>> &ranges, std::shared_ptr<std::vector<param_t>> ancilla, arg_strat strategy, 
                                                         couple<param_t, res_t> info, std::function<res_t(std::shared_ptr<std::vector<param_t>>)> f, std::size_t i = 0) {
@@ -114,6 +164,15 @@ namespace isw::utils {
         return temp;
     }
 
+    /**
+     * @brief Finds all parameter combinations that minimize or maximize an objective function over arbitrary value sets.
+     * @tparam param_t The type of the parameter values (must be hashable).
+     * @tparam res_t The type of the objective function result.
+     * @param[in] ranges Vector of unordered sets, each containing allowed values for a parameter dimension.
+     * @param[in] f Objective function to evaluate on each complete parameter combination.
+     * @param[in] strategy Optimization direction (MIN or MAX).
+     * @return Bucket containing all parameter vectors that achieve the optimal result.
+     */
     template<typename param_t, typename res_t>
     bucket<param_t> arg_min_max(std::vector<std::unordered_set<param_t>> &ranges, 
                                                         std::function<res_t(std::shared_ptr<std::vector<param_t>>)> f, arg_strat strategy) {
@@ -124,6 +183,10 @@ namespace isw::utils {
         return info.first;
     }
 
+    /**
+     * @brief Rvalue overload of arg_min_max for arbitrary value sets.
+     * @details Moves the ranges into a local variable and delegates to the lvalue overload.
+     */
     template<typename param_t, typename res_t>
     bucket<param_t> arg_min_max(std::vector<std::unordered_set<param_t>> &&ranges, 
                                                         std::function<res_t(std::shared_ptr<std::vector<param_t>>)> f, arg_strat strategy) {
@@ -131,6 +194,13 @@ namespace isw::utils {
         return arg_min_max(rang, f, strategy);
     }
 
+    /**
+     * @brief Uniformly samples a random parameter vector from a bucket.
+     * @tparam param_t The type of the parameter values.
+     * @param[in] bucket Set of optimal parameter vectors to sample from.
+     * @param[in,out] engine Mersenne Twister random engine used for sampling.
+     * @return Shared pointer to a copy of the randomly selected parameter vector.
+     */
     template<typename param_t> 
     std::shared_ptr<std::vector<param_t>> get_unif_random(bucket<param_t> bucket, std::mt19937_64 &engine) {
         std::uniform_int_distribution< int > dist(0, bucket->size()-1);

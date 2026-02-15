@@ -627,7 +627,7 @@ TEST_CASE("logger_t: full logging workflow", "[logger][io]") {
 // ============================================================================
 
 TEST_CASE("markov_chain: deterministic transitions", "[markov]") {
-    isw::markov::markov_chain mc(3);
+    isw::markov::markov_chain_t mc(3);
     mc.matrix[0][1] = {1.0, 50.0};
     mc.matrix[1][2] = {1.0, 30.0};
     mc.matrix[2][2] = {1.0, 0.0};
@@ -639,7 +639,7 @@ TEST_CASE("markov_chain: deterministic transitions", "[markov]") {
 }
 
 TEST_CASE("markov_chain: probabilistic transitions converge", "[markov]") {
-    isw::markov::markov_chain mc(2);
+    isw::markov::markov_chain_t mc(2);
     mc.matrix[0][0] = {0.3, 0.0};
     mc.matrix[0][1] = {0.7, 0.0};
     mc.matrix[1][1] = {1.0, 0.0};
@@ -656,7 +656,7 @@ TEST_CASE("markov_chain: probabilistic transitions converge", "[markov]") {
 }
 
 TEST_CASE("markov_chain: cost stored in matrix", "[markov]") {
-    isw::markov::markov_chain mc(2);
+    isw::markov::markov_chain_t mc(2);
     mc.matrix[0][1] = {1.0, 42.0};
     mc.matrix[1][1] = {1.0, 0.0};
 

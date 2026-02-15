@@ -24,19 +24,46 @@
  * Description:
  *	This header file defines markov-related utilities.
  */
+#pragma once
+
 #include <utility>
 #include <vector>
 #include <random>
 
 namespace isw::markov {
-    class markov_chain {
+    /**
+     * @brief Represents a discrete-time Markov chain with transition probabilities and costs.
+     * @details Each entry matrix[i][j] is a pair {probability, cost} for the transition from state i to state j.
+     *   The probabilities in each row must sum to 1.
+     */
+    class markov_chain_t {
         public:
-            std::vector<std::vector<std::pair<double, double>>> matrix; // {prob, cost}
+            /**
+             * @brief Transition matrix storing {probability, cost} pairs.
+             * @details matrix[i][j].first is the transition probability from state i to j,
+             *   matrix[i][j].second is the cost associated with that transition.
+             */
+            std::vector<std::vector<std::pair<double, double>>> matrix;
 
+            /**
+             * @brief Samples the next state from the current state using the transition probabilities.
+             * @param[in] current The current state index.
+             * @param[in,out] engine Mersenne Twister random engine used for sampling.
+             * @return The next state index.
+             * @throws std::runtime_error If the Markov chain transition probabilities are not properly defined.
+             */
             size_t next_state(size_t current, std::mt19937_64 &engine);
 
-            markov_chain(size_t size);
+            /**
+             * @brief Constructs a Markov chain with a given number of states.
+             * @param[in] size The number of states. Allocates an size x size matrix.
+             */
+            markov_chain_t(size_t size);
 
-            markov_chain();
+            /**
+             * @brief Default constructor.
+             * @details Creates an empty Markov chain with no states.
+             */
+            markov_chain_t();
     };
 }

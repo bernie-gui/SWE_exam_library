@@ -619,7 +619,7 @@ TEST_CASE("montecarlo_t: average converges with more runs", "[montecarlo][conver
 
 TEST_CASE("markov_chain: models Test 1 MDP correctly", "[markov][integration]") {
     // Build the same MDP as Test 1 using the markov utility
-    isw::markov::markov_chain mc(4);
+    isw::markov::markov_chain_t mc(4);
     mc.matrix[0][1] = {1.0, 100.0};
     mc.matrix[1][2] = {0.7, 100.0};
     mc.matrix[1][3] = {0.3, 150.0};

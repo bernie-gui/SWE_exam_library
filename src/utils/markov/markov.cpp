@@ -30,7 +30,7 @@
 
 using namespace isw::markov;
 
-size_t markov_chain::next_state(size_t state, std::mt19937_64 &engine) {
+size_t markov_chain_t::next_state(size_t state, std::mt19937_64 &engine) {
     size_t size = matrix.size();
     std::uniform_real_distribution<double> unif(0, 1);
     double prob = unif(engine);
@@ -42,8 +42,8 @@ size_t markov_chain::next_state(size_t state, std::mt19937_64 &engine) {
     throw std::runtime_error(" markov_chain not defined properly ");
 }
 
-markov_chain::markov_chain(size_t size) : matrix(size) {
+markov_chain_t::markov_chain_t(size_t size) : matrix(size) {
     for (auto &el : matrix) el.resize(size);
 }
 
-markov_chain::markov_chain() : matrix() {}
+markov_chain_t::markov_chain_t() : matrix() {}
