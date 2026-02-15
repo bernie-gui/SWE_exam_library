@@ -22,7 +22,7 @@ class mkch_global : public global_t {
 
 };
 
-class markov : public process_t {
+class markov_p : public process_t {
     public:
         size_t state;
         double cost;
@@ -33,7 +33,7 @@ class markov : public process_t {
             cost = 0;
         }
 
-        markov() : process_t("mogus"), state(0), cost(0) {}
+        markov_p() : process_t("mogus"), state(0), cost(0) {}
 };
 
 class markov_thread : public thread_t {
@@ -42,7 +42,7 @@ class markov_thread : public thread_t {
         
         void fun() override {
             auto gl = get_global<mkch_global>();
-            auto p = get_process<markov>();
+            auto p = get_process<markov_p>();
             double extract = gl->get_random()->uniform_range(.0, 1.0);
             double accum = 0;
             for (size_t i = 0; i < gl->diagram.size(); i++) {
@@ -59,12 +59,12 @@ class markov_thread : public thread_t {
 class mkch_sim : public simulator_t {
     public:
         bool should_terminate() override {
-            auto mk = get_system()->get_processes<markov>()[0];
+            auto mk = get_system()->get_processes<markov_p>()[0];
             auto gl = get_global<mkch_global>();
             return mk->state == gl->diagram.size()-1;
         }
         void on_terminate() override {
-            auto mk = get_system()->get_processes<markov>()[0];
+            auto mk = get_system()->get_processes<markov_p>()[0];
             auto gl = get_global<mkch_global>();
             gl->set_montecarlo_current(static_cast<double>(mk->cost) <= gl->c_max);
         }
@@ -97,7 +97,7 @@ int main() {
     auto sys = std::make_shared<system_t>(gl);
     auto sim = std::make_shared<mkch_sim>(sys);
     auto monty = montecarlo_t::create(sim);
-    sys->add_process(std::make_shared<markov>()->add_thread(std::make_shared<markov_thread>(1)));
+    sys->add_process(std::make_shared<markov_p>()->add_thread(std::make_shared<markov_thread>(1)));
     monty->run();
     output_writer_t out("examples/example_11_25_2out.txt");
     out << "2025-01-09-Mario-Rossi-1234567" << std::endl 
