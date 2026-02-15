@@ -96,17 +96,18 @@ namespace isw::cs {
 
             void fun() override {
                 std::shared_ptr< mes_type > msg;
-                if ((msg = receive_message< mes_type >()) == nullptr) return;
-                auto it = _bindings.find(msg->world_key);
-                if (it != _bindings.end()) {
-                    auto& sorter = it->second;
-                    sorter(this->shared_from_this(), msg);
-                }
-                else {
-                    std::string err(" unknown sender world: ");
-                    err += msg->world_key;
-                    throw std::runtime_error(err);
-                }
+                if ((msg = receive_message< mes_type >()) != nullptr) {
+                    auto it = _bindings.find(msg->world_key);
+                    if (it != _bindings.end()) {
+                        auto& sorter = it->second;
+                        sorter(this->shared_from_this(), msg);
+                    }
+                    else {
+                        std::string err(" unknown sender world: ");
+                        err += msg->world_key;
+                        throw std::runtime_error(err);
+                    }
+                };
                 if (_compute)
                     set_compute_time(_compute());
                 if (_sleep)

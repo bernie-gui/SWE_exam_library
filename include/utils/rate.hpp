@@ -33,13 +33,15 @@ namespace isw::utils {
         public:
             rate_meas_t();
 
-            void update(double amount, double time);
+            void update(double amount, double denom);
+
+            void update(double denom);
 
             double get_rate();
 
             void init();
 
         private:
-            double _rate, _last_time;
+            double _rate, _last_denom;
     };
 }

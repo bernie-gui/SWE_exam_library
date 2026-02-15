@@ -103,9 +103,11 @@ class my_opt : public optimizer_t<double> {
                     ret.item = msg->item;
                     ret.tag = msg->tag;
                     pt->send_message(msg->sender, ret);
-                    double prob = gl->get_random()->uniform_range(0.0, 1.0);
-                    if (prob < gl->p) {
-                        p->database[msg->item] = gl->get_random()->uniform_range(0, gl->K);
+                    if (copy == -1) {
+                        double prob = gl->get_random()->uniform_range(0.0, 1.0);
+                        if (prob < gl->p) {
+                            p->database[msg->item] = gl->get_random()->uniform_range(0, gl->K);
+                        }
                     }
                 }}},
                 [gl](){return gl->get_random()->uniform_range(gl->V, gl->W);}
