@@ -114,6 +114,7 @@ namespace isw
                         {
                             best_param_so_far = arguments;
                             best_res_so_far = obj_resul;
+                            _board = _post;
                         };
                         break;
                     case optimizer_strategy::MAXIMIZE:
@@ -121,6 +122,7 @@ namespace isw
                         {
                             best_param_so_far = arguments;
                             best_res_so_far = obj_resul;
+                            _board = _post;
                         };
                         break;
                     default:
@@ -145,9 +147,17 @@ namespace isw
             optimize( strategy, std::vector< param_t >( 1, min_solution ), std::vector< param_t >( 1, max_solution ) );
         }
 
+        std::shared_ptr< void > get_board() {return _board;}
+    
+    protected:
+        void post(std::shared_ptr< void > obj) {
+                _post = obj;
+            }
+
     private:
         /** @brief The Monte Carlo simulator instance. */
         std::shared_ptr< global_t > _global;
+        std::shared_ptr< void > _board, _post;
     };
 
 } // namespace isw
