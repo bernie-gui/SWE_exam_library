@@ -1,6 +1,7 @@
 build/
 .cache/
 main
+parameters.txt
 # *.txt
 example_bins/
 

@@ -31,9 +31,9 @@
 
 using namespace isw;
 
-logger_t::logger_t( const std::filesystem::path &path )
+logger_t::logger_t( const std::filesystem::path &path ) : _block( false )
 {
-    std::ofstream _stream( path );
+    _stream = std::ofstream( path );
     if ( !_stream.is_open() )
     {
         throw std::runtime_error( "Could not open log file" );
