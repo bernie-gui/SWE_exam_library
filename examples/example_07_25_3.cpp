@@ -19,10 +19,10 @@ class requests_global : public global_t {
     public:
         size_t K, N, S, C, Q;
         double A, B, W, V, T, p, F, G;
-        utils::rate_meas_t measure;
+        utils::rate_meas_t measure_v;
         void init() override {
             global_t::init();
-            measure.init();
+            measure_v.init();
         }
 };
 
@@ -49,7 +49,7 @@ class cust_thread_1 : public thread_t {
             send_message("Servers", server, msg);
             auto msg2 = receive_message<cs::request_t>();
             if (msg2 && msg2->quantity == -1) {
-                gl->measure.update(1, get_thread_time());
+                gl->measure_v.update(1, get_thread_time());
             }
             set_compute_time(gl->get_random()->uniform_range(gl->A, gl->B));
         }
@@ -65,7 +65,7 @@ class sim_help : public simulator_t {
         void on_terminate() override {
             auto gl = get_global<requests_global>();
             // gl->measure.update(0, gl->get_horizon()); //tecnicamente corretto ma cambia poco
-            gl->set_montecarlo_current(gl->measure.get_rate()); 
+            gl->set_montecarlo_current(gl->measure_v.get_rate()); 
         }
         sim_help(std::shared_ptr<system_t> s) : simulator_t(s) {}
 };

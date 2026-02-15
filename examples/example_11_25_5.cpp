@@ -22,10 +22,10 @@ class requests_global : public global_t {
     public:
         size_t K, P, S, C;
         double A, B, W, V, T, G, p;
-        utils::rate_meas_t measure;
+        utils::rate_meas_t measure_v;
         void init() override {
             global_t::init();
-            measure.init();
+            measure_v.init();
         }
 };
 
@@ -78,7 +78,7 @@ class sim_help : public simulator_t {
         void on_terminate() override {
             auto gl = get_global<requests_global>();
             // gl->measure.update(0, gl->get_horizon()); //tecnicamente corretto ma cambia poco
-            gl->set_montecarlo_current(gl->measure.get_rate()); 
+            gl->set_montecarlo_current(gl->measure_v.get_rate()); 
         }
         sim_help(std::shared_ptr<system_t> s) : simulator_t(s) {}
 };
@@ -97,7 +97,7 @@ class my_opt : public optimizer_t<double> {
                     auto p = pt->template get_process<cs::server_t>();
                     int copy = msg->quantity > (int) p->database[msg->item] ? -1 : 1;
                     cs::request_t ret;
-                    if (copy == -1) gl->measure.update(1, pt->get_thread_time());
+                    if (copy == -1) gl->measure_v.update(1, pt->get_thread_time());
                     else p->database[msg->item]--;
                     ret.quantity = copy;
                     ret.item = msg->item;

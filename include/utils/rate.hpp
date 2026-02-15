@@ -57,10 +57,8 @@ namespace isw::utils {
              */
             void update(double denom);
 
-            /**
-             * @brief Returns the current rate value.
-             * @return The computed rate.
-             */
+            void increase(double amount); 
+
             double get_rate();
 
             /**
