@@ -27,6 +27,7 @@
 #pragma once
 
 #include <cstddef>
+#include <vector>
 #include "network/message.hpp"
 #include "random.hpp"
 
@@ -119,23 +120,25 @@ namespace isw
          * @brief Gets the Monte Carlo average.
          * @return The Monte Carlo average value.
          */
-        double get_montecarlo_avg() const;
+        double get_montecarlo_avg( size_t idx = 0 ) const;
         /**
          * @brief Sets the Monte Carlo average.
          * @param[in] avg The average value to set.
          */
-        void set_montecarlo_avg( double avg );
+        void set_montecarlo_avg( double avg, size_t idx = 0 );
 
         /**
          * @brief Gets the current Monte Carlo value.
          * @return The current Monte Carlo value.
          */
-        double montecarlo_current() const;
+        double montecarlo_current( size_t idx = 0 ) const;
         /**
          * @brief Sets the current Monte Carlo value.
          * @param[in] current The current value to set.
          */
-        void set_montecarlo_current( double current );
+        void set_montecarlo_current( double current, size_t idx = 0 );
+
+        size_t get_montecarlo_variables();
 
         /**
          * @brief Gets the optimizer result.
@@ -188,9 +191,9 @@ namespace isw
         /** @brief Network number. */
         size_t _network_number;
         /** @brief Monte Carlo average. */
-        double _montecarlo_avg;
+        std::vector<double> _montecarlo_avg;
         /** @brief Current Monte Carlo value. */
-        double _montecarlo_current;
+        std::vector<double> _montecarlo_current;
         /** @brief Optimizer result. */
         double _optimizer_result;
         /** @brief Arguments vector. */

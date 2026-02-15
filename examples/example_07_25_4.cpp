@@ -48,13 +48,13 @@ class cust_thread_1 : public thread_t {
             server = gl->get_random()->uniform_range(0, gl->S-1);;
             // p->request_history.emplace(std::make_tuple(server, msg.item, msg.tag), msg.quantity);
             send_message("Servers", server, msg);
-            gl->measure_w.update(1);
+            gl->measure_w.increase_denom(1);
             std::shared_ptr<cs::request_t> msg2;
             while ((msg2 = receive_message<cs::request_t>())) {
                 if (msg2->quantity == -1) {
                     gl->measure_v.update(1, get_thread_time());
                 }
-                gl->measure_w.increase(1);
+                gl->measure_w.increase_amount(1);
             }
             set_compute_time(gl->get_random()->uniform_range(gl->A, gl->B));
         }
@@ -70,7 +70,8 @@ class sim_help : public simulator_t {
         void on_terminate() override {
             auto gl = get_global<requests_global>();
             // gl->measure.update(0, gl->get_horizon()); //tecnicamente corretto ma cambia poco
-            gl->set_montecarlo_current(gl->measure_v.get_rate()); 
+            gl->set_montecarlo_current(gl->measure_v.get_rate());
+            gl->set_montecarlo_current(gl->measure_w.get_rate(), 1);
         }
         sim_help(std::shared_ptr<system_t> s) : simulator_t(s) {}
 };
@@ -130,6 +131,6 @@ int main()
     monty->run();
 
     std::cout << "V " << gl->get_montecarlo_avg() << std::endl
-                << "W " << gl->get_montecarlo_avg() << std::endl;
+                << "W " << gl->get_montecarlo_avg(1) << std::endl;
     return 0;
 }

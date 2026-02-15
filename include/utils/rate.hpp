@@ -57,7 +57,8 @@ namespace isw::utils {
              */
             void update(double denom);
 
-            void increase(double amount); 
+            void increase_amount(double amount); 
+            void increase_denom(double increase);
 
             double get_rate();
 

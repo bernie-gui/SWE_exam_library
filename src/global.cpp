@@ -25,17 +25,18 @@
  *	This file implements the global_t class methods for managing global state in the simulation system.
  */
 #include "global.hpp"
+#include <cstddef>
 
 using namespace isw;
 
 
-global_t::global_t() : _rand( std::make_shared< random_t >() ) {}
+global_t::global_t() : _rand( std::make_shared< random_t >() ), _montecarlo_avg(1), _montecarlo_current(1) {}
 
 void global_t::init()
 {
     std::fill( _channel_in.begin(), _channel_in.end(), network::channel_t() );
     std::fill( _channel_out.begin(), _channel_out.end(), network::channel_t() );
-    _montecarlo_current = 0;
+    std::fill( _montecarlo_current.begin(), _montecarlo_current.end(), 0 );
     // altre cose da inizializzare?
 }
 
@@ -56,11 +57,19 @@ void global_t::set_optimizer_budget( size_t optimizer_budget ) { _optimizer_budg
 size_t global_t::network_number() const { return _network_number; }
 void global_t::set_network_number( size_t network_number ) { _network_number = network_number; }
 
-double global_t::get_montecarlo_avg() const { return _montecarlo_avg; }
-void global_t::set_montecarlo_avg( double avg ) { _montecarlo_avg = avg; }
+double global_t::get_montecarlo_avg( size_t idx ) const { return _montecarlo_avg[idx]; }
+void global_t::set_montecarlo_avg( double avg, size_t idx ) { 
+    if (idx >= _montecarlo_avg.size()) _montecarlo_avg.resize(idx+1);
+    _montecarlo_avg[idx] = avg; 
+}
 
-double global_t::montecarlo_current() const { return _montecarlo_current; }
-void global_t::set_montecarlo_current( double current ) { _montecarlo_current = current; }
+double global_t::montecarlo_current( size_t idx ) const { return _montecarlo_current[idx]; }
+void global_t::set_montecarlo_current( double current, size_t idx ) { 
+    if (idx >= _montecarlo_current.size()) _montecarlo_current.resize(idx+1);
+    _montecarlo_current[idx] = current; 
+}
+
+size_t global_t::get_montecarlo_variables() { return _montecarlo_current.size(); }
 
 double global_t::get_optimizer_result() const { return _optimizer_result; }
 void global_t::set_optimizer_result( double current ) { _optimizer_result = current; }

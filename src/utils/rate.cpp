@@ -41,8 +41,12 @@ void rate_meas_t::update(double denom) {
     update(0, denom);
 }
 
-void rate_meas_t::increase(double amount) {
+void rate_meas_t::increase_amount(double amount) {
     update(amount, _last_denom);
+}
+
+void rate_meas_t::increase_denom(double increase) {
+    update(0, _last_denom + increase);
 }
 
 void rate_meas_t::init() {

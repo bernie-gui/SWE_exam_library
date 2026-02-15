@@ -25,6 +25,7 @@
  *	This file implements the montecarlo_t class methods for running Monte Carlo simulations.
  */
 #include "montecarlo.hpp"
+#include <cstddef>
 #include "simulator.hpp"
 using namespace isw;
 
@@ -36,13 +37,16 @@ void montecarlo_t::run()
 {
     auto global = _sim->get_system()->get_global();
     global->set_montecarlo_avg( 0.0 );
+    double local_value;
     for ( size_t i = 0; i < global->montecarlo_budget(); i++ )
     {
         _sim->run();
 
-        double local_value = global->get_montecarlo_avg() * ( i / static_cast< double >( i + 1 ) ) +
-            global->montecarlo_current() / static_cast< double >( i + 1 );
-        global->set_montecarlo_avg( local_value );
+        for (size_t j = 0; j < global->get_montecarlo_variables(); j++) {
+            local_value = global->get_montecarlo_avg(j) * ( i / static_cast< double >( i + 1 ) ) +
+                global->montecarlo_current(j) / static_cast< double >( i + 1 );
+            global->set_montecarlo_avg( local_value, j );
+        }
     }
 }
 std::shared_ptr< montecarlo_t > montecarlo_t::create( const std::shared_ptr< simulator_t > sim )
