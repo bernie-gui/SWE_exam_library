@@ -116,3 +116,40 @@ examples: $(EX_BINS)
 clean:
 	-rm -rf $(TARGET) $(EX_BINS)
 	-@rm -rf $(BUILD_DIR)/* $(BUILD_DIR)/.[!.]* $(BUILD_DIR)/..?* 2>/dev/null || true
+
+# Unit Tests
+TEST_OBJ_DIR := $(BUILD_DIR)/tests
+CATCH_OBJ    := $(TEST_OBJ_DIR)/catch_lib.o
+CATCH_SRC    := tests/catch_lib.cpp
+
+$(TEST_OBJ_DIR):
+	mkdir -p $(TEST_OBJ_DIR)
+
+$(CATCH_OBJ): $(CATCH_SRC) | $(TEST_OBJ_DIR)
+	@echo "Compiling Catch2 core (one-time setup)..."
+	$(CXX) $(CXXSTD) -Itests -w -c $< -o $@
+
+.PHONY: run_tests
+run_tests: $(OBJ_FILES) $(CATCH_OBJ)
+	@echo "Running tests..."
+	@failed=0; \
+	for test in tests/test_*.cpp; do \
+		if [ -f "$$test" ]; then \
+			exe="tests/$$(basename $$test .cpp)"; \
+			$(CXX) $(CXXSTD) -Itests $(INCLUDES) $$test $(CATCH_OBJ) $(OBJ_FILES) $(LDFLAGS) -o $$exe && \
+			./$$exe; \
+			if [ $$? -eq 0 ]; then \
+				echo "$$test passed ✓"; \
+			else \
+				echo "$$test failed ✗"; \
+				failed=1; \
+			fi; \
+			rm -f $$exe; \
+		fi; \
+	done; \
+	if [ $$failed -eq 1 ]; then \
+		echo "Some tests failed! ✗"; \
+		exit 1; \
+	else \
+		echo "All tests passed! ✓"; \
+	fi
