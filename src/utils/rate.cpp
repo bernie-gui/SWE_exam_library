@@ -28,13 +28,14 @@
 #include "utils/rate.hpp"
 using namespace isw::utils;
 
-rate_meas_t::rate_meas_t(): _rate(0), _last_denom(0) {}
+rate_meas_t::rate_meas_t(): _rate(0), _last_denom(0), _updated(false) {}
 
 void rate_meas_t::update(double amount, double denom) {
     if (!denom) 
         throw std::runtime_error("Math error in rate measurement: update method called at time zero");
     _rate = _rate * ( _last_denom / denom ) + amount / denom;
     _last_denom = denom;
+    if (!_updated) _updated = true;
 }
 
 void rate_meas_t::update(double denom) {
@@ -49,8 +50,11 @@ void rate_meas_t::increase_denom(double increase) {
     update(0, _last_denom + increase);
 }
 
+bool rate_meas_t::was_updated() { return  _updated;}
+
 void rate_meas_t::init() {
     _rate = _last_denom = 0;
+    _updated = false;
 }
 
 double rate_meas_t::get_rate() {return _rate;}

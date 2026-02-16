@@ -28,20 +28,15 @@
 
 size_t isw::uv::count_collisions(const std::vector<std::shared_ptr<vehicle_t>> &vehicles, 
     double coll_radius, size_t dimensions) {
-        std::vector< std::vector< bool > > collisions;
         size_t id1, id2, collision_count = 0;
         double dist = 0;
-        collisions.resize( vehicles.size() );
-        for ( auto &row : collisions )
-            row.resize( vehicles.size() );
         for ( auto v1 : vehicles )
             for ( auto v2 : vehicles ) {
                 id1 = v1->get_relative_id().value();
                 id2 = v2->get_relative_id().value();
-                if ( collisions[id2][id1] || id1 == id2 ) continue;
+                if ( id1 >= id2 ) continue;
                 dist = euclidean_distance(v1, v2, dimensions);
                 if ( dist > coll_radius ) continue;
-                collisions[id1][id2] = true;
                 collision_count++;
             }
         return collision_count;

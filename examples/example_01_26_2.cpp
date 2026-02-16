@@ -79,7 +79,7 @@ int main()
                     auto procs = pt->get_system()->template get_processes< uv::vehicle_t >("UAVs");
                     double add, ret = 0;
                     for (auto &p : procs) {
-                        if (p->get_id() == pt->get_id()) continue;
+                        if (p->get_id().value() == pt->get_id().value()) continue;
                         for (size_t k = 0; k < 3; k++) {
                             add = ((pt->pos[k] + (*v)[k] * gl->T) - p->pos[k]) / (2 * gl->L);
                             add *= add;

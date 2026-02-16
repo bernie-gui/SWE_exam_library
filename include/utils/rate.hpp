@@ -62,6 +62,8 @@ namespace isw::utils {
 
             double get_rate();
 
+            bool was_updated();
+
             /**
              * @brief Resets the rate measurement to its initial state.
              * @details Sets both rate and last denominator to 0.
@@ -73,5 +75,6 @@ namespace isw::utils {
             double _rate;
             /** @brief Last denominator used for the update formula. */
             double _last_denom;
+            bool _updated;
     };
 }

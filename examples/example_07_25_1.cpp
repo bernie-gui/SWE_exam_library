@@ -60,7 +60,7 @@ class my_thread : public thread_t {
                             first *= gl->A;
                             for (auto j : p->get_system()->get_processes<my_vehicle>())
                                 for (int i = 0; i < 2; i++) {
-                                    if (j->get_relative_id() == p->get_relative_id()) continue;
+                                    if (j->get_relative_id().value() == p->get_relative_id().value()) continue;
                                     second += (j->pos[i] - p->pos[i]) * (j->pos[i] - p->pos[i]);
                             }
                             second *= (1 - gl->A);
@@ -81,19 +81,15 @@ class my_thread : public thread_t {
 class monitor_coll : public thread_t {
     public:
         void fun() override{
-            std::vector< std::vector< bool > > collisions;
             size_t id1, id2, collision_count = 0;
             auto gl = get_global<my_global>();
             auto &ps = get_process()->get_system()->get_processes<my_vehicle>();
             double temp, dist;
-            collisions.resize( gl->N );
-            for ( auto &row : collisions )
-                row.resize( gl->N );
             for ( auto v1 : ps )
                 for ( auto v2 : ps ) {
                     id1 = v1->get_relative_id().value();
                     id2 = v2->get_relative_id().value();
-                    if ( collisions[id2][id1] || id1 == id2 ) continue;
+                    if ( id1 >= id2 ) continue;
                     dist = 0;
                     for ( size_t i = 0; i < 2; i++ ) {
                         temp =  v1->pos[i] - v2->pos[i];
@@ -101,7 +97,6 @@ class monitor_coll : public thread_t {
                     }
                     dist = std::sqrt( dist );
                     if (dist <= 0.1) {
-                        collisions[id1][id2] = true;
                         collision_count++;
                     }
             }
