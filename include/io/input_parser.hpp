@@ -29,9 +29,11 @@
 #include <cassert>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 
 namespace isw
 {
+    using parser = std::function<void(std::istringstream&)>;
 
     /**
      * @brief Base class for parsing input files and configuring global state.

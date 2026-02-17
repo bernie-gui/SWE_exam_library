@@ -27,12 +27,9 @@
 #pragma once
 
 #include <unordered_map>
-#include <functional>
 #include "io/input_parser.hpp"
 
 namespace isw {
-
-    using parser = std::function<void(std::istringstream&)>;
 
     /**
      * @brief Input parser implementation using lambdas.

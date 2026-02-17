@@ -135,7 +135,7 @@ int main()
                 double prob = gl->get_random()->uniform_range(0.0, 1.0);
                 if (prob < gl->p) {
                     p->database[msg->item] += gl->Q;
-                    pt->set_thread_time(gl->G-gl->F);
+                    pt->set_thread_time(pt->get_thread_time() + gl->G-gl->F);
                 }
             }}}
         ), "Servers" );
