@@ -6,6 +6,7 @@
 #include <memory>
 // #include <tuple>
 #include <ostream>
+#include <utility>
 #include <vector>
 // #include "utils/customer-server/utils.hpp"
 // #include "utils/customer-server/server.hpp"
@@ -13,6 +14,7 @@
 #include "io/array_parser.hpp"
 #include "montecarlo.hpp"
 #include "network/message.hpp"
+#include "optimizer.hpp"
 #include "process.hpp"
 #include "simulator.hpp"
 #include "system.hpp"
@@ -23,11 +25,13 @@ const int TIMESTEP = 1;
 
 class requests_global : public global_t {
     public:
-        size_t n, k, oversell;
-        double a;
+        size_t n, k, trans, oversell;
+        double a, W, S;
         std::vector<double> p, f;
+        std::shared_ptr<simulator_t> sim;
         void init() override {
             global_t::init();
+            trans = 0;
             oversell = 0;
             // measure_v.init();
             // measure_w.init();
@@ -105,10 +109,25 @@ class sim_help : public simulator_t {
         void on_terminate() override {
             auto gl = get_global<requests_global>();
             // gl->measure.update(0, gl->get_horizon()); //tecnicamente corretto ma cambia poco
-            gl->set_montecarlo_current(gl->oversell);
+            gl->W = gl->trans / (gl->n * gl->get_horizon());
+            gl->S = gl->oversell / (gl->n * gl->get_horizon());
             // gl->set_montecarlo_current(gl->measure_w.get_rate(), 1);
         }
         sim_help(std::shared_ptr<system_t> s) : simulator_t(s) {}
+};
+
+class my_opt : public optimizer_t<double> {
+    public:
+        double obj_fun(std::vector<double> &args) override {
+            auto gl = get_global< requests_global >();
+            gl->a = args[0];
+            gl->sim->run();
+            auto p = std::make_shared<std::pair<double, double>>(gl->W, gl->S);
+            post(p);
+            return gl->W - gl->S;
+        }
+
+        my_opt(std::shared_ptr<requests_global> gl) : optimizer_t<double>(gl) {}
 };
 
 int main()
@@ -121,7 +140,6 @@ int main()
         [gl](auto& iss) { iss >> gl->k;
                             gl->p.resize(gl->k);
                             gl->f.resize(gl->k); },
-        [gl](auto &iss) { iss >> gl->a; },
         [gl](auto& iss) { for (size_t i = 0; i < gl->k; i++) iss >> gl->p[i]; },
         [gl](auto& iss) { for (size_t i = 0; i < gl->k; i++) iss >> gl->f[i]; },
     });
@@ -137,6 +155,7 @@ int main()
                 auto p = pt->template get_process<cs::server_t>();
                 my_msg ret;
                 double extract;
+                gl->trans++; 
                 // std::cout << "ok" << std::endl;
                 // std::cout << msg->item << std::endl;
                 if (p->database[msg->item*2] - p->database[msg->item*2+1] == 0) 
@@ -169,14 +188,18 @@ int main()
     sys->add_process(std::make_shared<process_t>()->add_thread(std::make_shared<supplier>(&database)));
     sys->add_network();
 
-    auto sim = std::make_shared< sim_help >( sys );
+    gl->sim = std::make_shared< sim_help >( sys );
     // sim->run();
+    // gl->set_montecarlo_budget(1000);
 
-    auto monty = montecarlo_t::create(sim);
-    gl->set_montecarlo_budget(1000);
-    monty->run();
+    gl->set_optimizer_budget(1000);
+    my_opt opty(gl);
+    opty.optimize(optimizer_strategy::MAXIMIZE, 0, 1);
 
-    std::cout << "S " << gl->get_montecarlo_avg() << std::endl
-            << "R " << gl->get_montecarlo_avg() / (gl->n * gl->get_horizon()) << std::endl;
+    std::cout // << std::fixed //da chiedere
+        << "A " << gl->get_optimizer_optimal_parameters()[0] << std::endl
+        << "W " << std::static_pointer_cast<std::pair<double, double>>(opty.get_board())->first << std::endl
+        << "S " << std::static_pointer_cast<std::pair<double, double>>(opty.get_board())->second << std::endl
+        << "J " << gl->get_optimizer_result() << std::endl;
     return 0;
 }
