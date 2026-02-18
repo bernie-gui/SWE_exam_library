@@ -29,23 +29,21 @@
 #include <cstddef>
 #include "utils/vehicles/vehicle.hpp"
 
-namespace isw::uv {
+namespace isw::uv
+{
     /**
      * @brief Counts the number of pairwise collisions among vehicles.
      * @param[in] vehicles Vector of vehicle shared pointers.
      * @param[in] coll_radius Distance threshold below which two vehicles are considered colliding.
-     * @param[in] dimensions Number of spatial dimensions to consider.
      * @return Number of unique vehicle pairs within collision radius.
      */
-    size_t count_collisions(const std::vector<std::shared_ptr<vehicle_t>> &vehicles, 
-        double coll_radius, size_t dimensions);
+    size_t count_collisions( const std::vector< std::shared_ptr< vehicle_t > > &vehicles, double coll_radius );
 
     /**
      * @brief Computes the Euclidean distance between two vehicles.
      * @param[in] v1 First vehicle.
      * @param[in] v2 Second vehicle.
-     * @param[in] dimensions Number of spatial dimensions to consider.
      * @return Euclidean distance between the two vehicles' position vectors.
      */
-    double euclidean_distance(std::shared_ptr<vehicle_t> v1, std::shared_ptr<vehicle_t> v2, size_t dimensions);
-}
+    double euclidean_distance( std::shared_ptr< vehicle_t > v1, std::shared_ptr< vehicle_t > v2 );
+} // namespace isw::uv
