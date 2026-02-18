@@ -27,12 +27,12 @@
 #pragma once
 
 #include <cstddef>
-#include <unordered_map>
 #include <memory>
 #include <optional>
 #include <set>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <vector>
 #include "common.hpp"
 #include "global.hpp"
@@ -40,6 +40,7 @@
 
 namespace isw
 {
+
     struct world_entry_t
     {
         world_key_t world;
@@ -61,8 +62,7 @@ namespace isw
          * @param[in] global Shared pointer to global state, defaults to new global_t.
          * @param[in] name System name, defaults to "default_system".
          */
-        system_t( std::shared_ptr< global_t > global,
-                  const std::string &name = "default_system" );
+        system_t( std::shared_ptr< global_t > global, const std::string &name = "default_system" );
         /**
          * @brief Initializes the system.
          * @details Initializes global, processes, and networks, resets time to 0.
@@ -93,8 +93,8 @@ namespace isw
          */
         std::shared_ptr< system_t > add_network( std::shared_ptr< network_t > net );
         // TODO: add documentation
-        std::shared_ptr< system_t > add_pid_network( double obj_occupancy = 1, double th_time = 0.0 , 
-            double error_threshold = 0);
+        std::shared_ptr< system_t > add_pid_network( double obj_occupancy = 1, double th_time = 0.0,
+                                                     double error_threshold = 0 );
         /**
          * @brief Registers a process to a specific world.
          * @param[in] p Shared pointer to the process.

@@ -48,9 +48,9 @@ void process_t::schedule( double current_time )
 {
     assert( _system.get() != nullptr ); // ENSURE THIS PROCESS IS ASSOCIATED TO A SYSTEM
     auto random = _system->get_global()->get_random();
-    auto shuffled = _threads;
-    std::shuffle( shuffled.begin(), shuffled.end(), random->get_engine() );
-    for ( auto &thread : shuffled )
+    // auto shuffled = _threads;
+    // std::shuffle( shuffled.begin(), shuffled.end(), random->get_engine() );
+    for ( auto &thread : _threads )
         thread->schedule( current_time );
 }
 
@@ -125,10 +125,12 @@ void thread_t::set_sleep_time( double _s_time ) { this->_s_time = _s_time; };
 
 void thread_t::schedule( double current_time )
 {
+    auto gl = get_global();
+    double noise = gl->get_random()->uniform_range( noise_min, noise_max );
     if ( this->_th_time > current_time )
         return;
     fun();
-    _th_time += _c_time + _s_time;
+    _th_time += ( _c_time + _s_time ) * ( 1 + noise );
 }
 
 void thread_t::set_process( std::shared_ptr< process_t > process ) { _process = process; }

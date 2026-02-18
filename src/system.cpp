@@ -43,7 +43,7 @@ void system_t::init()
     _global->init();
     for ( auto &process : _processes )
     {
-    	process->set_active(true); //...
+        process->set_active( true ); //...
         process->init();
     }
     for ( auto &network : _networks )
@@ -71,18 +71,20 @@ std::shared_ptr< system_t > system_t::add_network( std::shared_ptr< network_t > 
     return shared_from_this();
 }
 
-std::shared_ptr< system_t > system_t::add_pid_network( double obj_occupancy, double th_time, double error_threshold ) {
+std::shared_ptr< system_t > system_t::add_pid_network( double obj_occupancy, double th_time, double error_threshold )
+{
     auto net = std::make_shared< network_t >();
     net->add_thread( std::make_shared< pid_scanner_t >( obj_occupancy, th_time, error_threshold ) );
-    return add_network(net);
+    return add_network( net );
 }
 
 void system_t::_update_time()
 {
     double time = std::numeric_limits< double >::infinity();
-    for ( auto &proc : _processes ) {
-   		if (!proc->is_active())
-    		continue;
+    for ( auto &proc : _processes )
+    {
+        if ( !proc->is_active() )
+            continue;
         time = std::min< double >( proc->next_update_time(), time );
     }
     for ( auto &net : _networks )
@@ -93,11 +95,12 @@ void system_t::_update_time()
 void system_t::step()
 {
     _update_time();
-    auto shuffled = _processes;
-    std::shuffle( shuffled.begin(), shuffled.end(), _global->get_random()->get_engine() );
-    for ( auto &proc : shuffled ) {
-	   	if (!proc->is_active())
-	    		continue;
+    // auto shuffled = _processes;
+    // std::shuffle( shuffled.begin(), shuffled.end(), _global->get_random()->get_engine() );
+    for ( auto &proc : _processes )
+    {
+        if ( !proc->is_active() )
+            continue;
         proc->schedule( _time );
     }
     for ( auto &net : _networks )
@@ -143,22 +146,27 @@ size_t system_t::get_abs_id( world_key_t world, size_t rel_id ) const
     }
 }
 
-world_entry_t system_t::get_rel_id( size_t abs_id ) const {
-	// iterator worlds to find the world containing abs_id
-	for (auto& [world_key, world] : _worlds) {
-		if (world.find(abs_id) != world.end()) {
-			// found the world
-			// now find the relative id
-			size_t rel_id = 0;
-			for (auto id : world) {
-				if (id == abs_id) {
-					return {world_key, rel_id};
-				}
-				rel_id++;
-			}
-		}
-	}
-	throw std::out_of_range("absolute ID not found" );
+world_entry_t system_t::get_rel_id( size_t abs_id ) const
+{
+    // iterator worlds to find the world containing abs_id
+    for ( auto &[world_key, world] : _worlds )
+    {
+        if ( world.find( abs_id ) != world.end() )
+        {
+            // found the world
+            // now find the relative id
+            size_t rel_id = 0;
+            for ( auto id : world )
+            {
+                if ( id == abs_id )
+                {
+                    return { world_key, rel_id };
+                }
+                rel_id++;
+            }
+        }
+    }
+    throw std::out_of_range( "absolute ID not found" );
 }
 
 const std::vector< process_ptr_t > &system_t::get_processes() const { return _processes; }

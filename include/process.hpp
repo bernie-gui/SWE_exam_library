@@ -155,6 +155,9 @@ namespace isw
         bool _is_active;
     };
 
+
+    const double noise_min = -0.005;
+    const double noise_max = 0.005;
     /**
      * @brief Base class for threads in the simulation system.
      * @details Manages timing, scheduling, and message passing.
